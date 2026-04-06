@@ -44,3 +44,136 @@ input {
   border: 0;
   z-index: 20000;
 }
+
+/* ── Home page ─────────────────────────────────────────────────────────────── */
+
+.home-hero {
+  background: linear-gradient(135deg, #1a2a4a 0%, #0d1b2e 60%, #1a3a2a 100%);
+  color: #fff;
+  padding: 80px 0 60px;
+  margin-top: 50px; /* navbar height */
+  text-align: center;
+}
+
+.home-hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: #c8e6c9;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.home-hero-title {
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin: 0 0 18px;
+  font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.home-hero-subtitle {
+  font-size: 18px;
+  color: rgba(255,255,255,0.80);
+  max-width: 620px;
+  margin: 0 auto 16px;
+  line-height: 1.6;
+}
+
+.home-hero-meta {
+  font-size: 13px;
+  color: rgba(255,255,255,0.50);
+  letter-spacing: 0.5px;
+}
+
+.home-modules {
+  padding-top: 48px;
+  padding-bottom: 40px;
+}
+
+.home-card {
+  display: block;
+  background: #fff;
+  border: 1px solid #e4e8ee;
+  border-radius: 8px;
+  padding: 28px 24px 24px;
+  margin-bottom: 24px;
+  color: #2c3e50;
+  text-decoration: none;
+  transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+
+.home-card:hover,
+.home-card:focus {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  transform: translateY(-3px);
+  border-color: #3a7bd5;
+  color: #1a2a4a;
+  text-decoration: none;
+}
+
+.home-card-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #3a7bd5, #1a5faa);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.home-card-icon .glyphicon {
+  color: #fff;
+  font-size: 22px;
+}
+
+.home-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.home-card p {
+  font-size: 13.5px;
+  color: #6b7c93;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Coinbase balance validation ────────────────────────────────────────────── */
+
+.coinbase-balance-warning {
+  display: none;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-left: 4px solid #e67e00;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #7a4f00;
+  margin-bottom: 4px;
+}
+
+.coinbase-balance-warning.visible {
+  display: block;
+}
+
+.coinbase-balance-warning .glyphicon {
+  color: #e67e00;
+}
+
+/* ── Home attribution ────────────────────────────────────────────────────────── */
+
+.home-attribution {
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+  padding: 12px 0 24px;
+  border-top: 1px solid #eee;
+}

@@ -45,6 +45,13 @@
         input.form-control(id='block'+block.block+'chain'+block.chain+'hash', type='text' disabled)
 
     .form-group
+      .col-sm-10.col-sm-offset-2
+        .coinbase-balance-warning(id='block'+block.block+'chain'+block.chain+'balanceWarning')
+          span.glyphicon.glyphicon-exclamation-sign
+          strong  Fondos insuficientes
+          |  — las transacciones superan el coinbase. El minero rechaza este bloque.
+
+    .form-group
       .col-sm-2
         i.icon-spinner.icon-spin.icon-large
       .col-sm-10

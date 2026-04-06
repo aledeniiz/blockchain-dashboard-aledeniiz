@@ -2,35 +2,46 @@
 // global variable setup
 /////////////////////////
 
-// number of zeros required at front of hash
-var difficultyMajor = 4;
-
 // 0-15, maximum (decimal) value of the hex digit after the front
 // 15 means any hex character is allowed next
-// 7  means next bit must be 0 (because 0x7=0111),
-//    (so the bit-strength is doubled)
-// 0  means only 0x0 can be next
-//    (equivalent to one more difficultyMajor)
-var difficultyMinor = 15;  
+// 7  means next bit must be 0 (because 0x7=0111, so 1 more 0 bit)
+// 0  means only 0x0 can be next (equivalent to one more difficultyMajor)
+var difficultyMinor = 15;
 
-var maximumNonce = 8;  // limit the nonce so we don't mine too long
-var pattern = '';
-for (var x=0; x<difficultyMajor; x++) {
-  pattern += '0';     // every additional required 0
-  maximumNonce *= 16; // takes 16x longer to mine
+var difficultyMajor, maximumNonce, pattern, patternLen;
+
+function setDifficulty(major) {
+  difficultyMajor = major;
+  maximumNonce = 8;
+  pattern = '';
+  for (var x = 0; x < difficultyMajor; x++) {
+    pattern += '0';
+    maximumNonce *= 16;
+  }
+  pattern += difficultyMinor.toString(16);
+  patternLen = pattern.length;
+
+  if      (difficultyMinor == 0) { maximumNonce *= 16; }
+  else if (difficultyMinor == 1) { maximumNonce *= 8;  }
+  else if (difficultyMinor <= 3) { maximumNonce *= 4;  }
+  else if (difficultyMinor <= 7) { maximumNonce *= 2;  }
+
+  // update active item in navbar dropdown
+  $('#difficulty-label').text('Difficulty: ' + major);
+  $('.difficulty-option').removeClass('active');
+  $('#difficulty-' + major).addClass('active');
+
+  // re-evaluate state of all visible blocks
+  for (var b = 1; b <= 5; b++) {
+    for (var c = 0; c <= 3; c++) {
+      if ($('#block' + b + 'chain' + c + 'hash').length) {
+        updateState(b, c);
+      }
+    }
+  }
 }
-// at this point in the setup, difficultyMajor=4
-// yields pattern '0000' and maximumNonce 8*16^4=524288
 
-// add one more hex-char for the minor difficulty
-pattern += difficultyMinor.toString(16);
-var patternLen = pattern.length; // == difficultyMajor+1
-
-if      (difficultyMinor == 0) { maximumNonce *= 16; } // 0000 require 4 more 0 bits
-else if (difficultyMinor == 1) { maximumNonce *= 8;  } // 0001 require 3 more 0 bits
-else if (difficultyMinor <= 3) { maximumNonce *= 4;  } // 0011 require 2 more 0 bits
-else if (difficultyMinor <= 7) { maximumNonce *= 2;  } // 0111 require 1 more 0 bit
-// else don't bother increasing maximumNonce, it already started with 8x padding
+setDifficulty(4); // default: 4 leading zeros
 
 
 

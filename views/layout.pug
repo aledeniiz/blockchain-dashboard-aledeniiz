@@ -49,5 +49,23 @@ html
               a(href='/tokens') #{__('Tokens')}
             li(class={active: page === 'coinbase'})
               a(href='/coinbase') #{__('Coinbase')}
+            li.dropdown
+              a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                span#difficulty-label Difficulty: 4
+                span.caret
+              ul.dropdown-menu.dropdown-menu-right
+                li.dropdown-header Leading zeros required
+                li.difficulty-option#difficulty-1
+                  a(href='#', onclick='setDifficulty(1); return false;') 1 zero — instant
+                li.difficulty-option#difficulty-2
+                  a(href='#', onclick='setDifficulty(2); return false;') 2 zeros — seconds
+                li.difficulty-option#difficulty-3
+                  a(href='#', onclick='setDifficulty(3); return false;') 3 zeros — ~1 minute
+                li.difficulty-option.active#difficulty-4
+                  a(href='#', onclick='setDifficulty(4); return false;') 4 zeros — ~15 min (default)
+                li.difficulty-option#difficulty-5
+                  a(href='#', onclick='setDifficulty(5); return false;') 5 zeros — ~4 hours
+                li.difficulty-option#difficulty-6
+                  a(href='#', onclick='setDifficulty(6); return false;') 6 zeros — ~3 days
 
     block content

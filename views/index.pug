@@ -1,13 +1,70 @@
 extends layout
 
 block content
-  a(href='https://github.com/anders94/blockchain-demo/')
-    img.github-ribbon(src='/images/fork-me-on-github-ribbon.png', alt='Fork me on GitHub')
+  .home-hero
+    .container
+      .home-hero-badge Educational Tool
+      h1.home-hero-title Blockchain Demo
+      p.home-hero-subtitle
+        | An interactive, step-by-step visualization of how a blockchain works —
+        | from hashing a single value to a fully distributed ledger.
+      p.home-hero-meta
+        | Designed for classroom use &middot; Universidad Alfonso X el Sabio &middot; Cryptography
+
+  .container.home-modules
+    .row
+      .col-sm-6.col-md-4
+        a.home-card(href='/hash')
+          .home-card-icon
+            span.glyphicon.glyphicon-lock
+          h3 Hash Function
+          p
+            | Type any text and see its SHA-256 digest update in real time.
+            | Understand why even a single character change produces a completely different hash.
+      .col-sm-6.col-md-4
+        a.home-card(href='/block')
+          .home-card-icon
+            span.glyphicon.glyphicon-th-large
+          h3 Block
+          p
+            | Add a nonce to the data and mine until the hash meets the required difficulty target
+            | (leading zeros). See Proof-of-Work in action.
+      .col-sm-6.col-md-4
+        a.home-card(href='/blockchain')
+          .home-card-icon
+            span.glyphicon.glyphicon-link
+          h3 Blockchain
+          p
+            | Chain blocks together using each block&rsquo;s hash as the previous block pointer.
+            | Tamper with one block and watch the entire chain break.
+      .col-sm-6.col-md-4
+        a.home-card(href='/distributed')
+          .home-card-icon
+            span.glyphicon.glyphicon-globe
+          h3 Distributed
+          p
+            | Replicate the chain across multiple peers. Modify one peer&rsquo;s data and see
+            | how the network detects and rejects the tampered copy.
+      .col-sm-6.col-md-4
+        a.home-card(href='/tokens')
+          .home-card-icon
+            span.glyphicon.glyphicon-transfer
+          h3 Tokens
+          p
+            | Replace raw data with financial transactions. See how a blockchain
+            | records who sends how much to whom without a central bank.
+      .col-sm-6.col-md-4
+        a.home-card(href='/coinbase')
+          .home-card-icon
+            span.glyphicon.glyphicon-star
+          h3 Coinbase
+          p
+            | Add a special coinbase transaction that creates new coins from nothing —
+            | the mechanism by which miners are rewarded.
+
   .container
-    h1 Blockchain Demo
-    .embed-responsive.embed-responsive-16by9
-      iframe.embed-responsive-item(src='https://www.youtube.com/embed/_160oMzblY8')
-    br
-    p.pull-right by 
-      a(href='http://andersbrownworth.com/') Anders Brownworth 
-      | 1K3NvcuZzVTueHW1qhkG2Cm3viRkh2EXJp
+    p.home-attribution
+      | Original demo by&nbsp;
+      a(href='http://andersbrownworth.com/') Anders Brownworth
+      | &nbsp;&middot;&nbsp;
+      a(href='https://github.com/anders94/blockchain-demo/') Source on GitHub

@@ -53,19 +53,43 @@ block content
       return s;
     }
 
+    function checkBalance(block, chain) {
+      var coinbase = parseFloat($('#block'+block+'chain'+chain+'coinbasevalue').val()) || 0;
+      var total = 0;
+      for (var x = 0; $('#block'+block+'chain'+chain+'tx'+x+'value').length > 0; x++) {
+        total += parseFloat($('#block'+block+'chain'+chain+'tx'+x+'value').val()) || 0;
+      }
+      var insufficient = Math.round(total * 100) > Math.round(coinbase * 100);
+      var warningEl = $('#block'+block+'chain'+chain+'balanceWarning');
+      var mineBtn   = $('#block'+block+'chain'+chain+'mineButton');
+      if (insufficient) {
+        warningEl.addClass('visible');
+        mineBtn.prop('disabled', true);
+      } else {
+        warningEl.removeClass('visible');
+        mineBtn.prop('disabled', false);
+      }
+      return !insufficient;
+    }
+
     function setup(block, chain) {
       updateHash(block, chain);
-      $('#block'+block+'chain'+chain+'number').bind('input propertychange', function() { updateChain(block, chain); });
-      $('#block'+block+'chain'+chain+'nonce').bind('input propertychange', function() { updateChain(block, chain); });
-      $('#block'+block+'chain'+chain+'coinbasevalue').bind('input propertychange', function() { updateChain(block, chain); });
-      $('#block'+block+'chain'+chain+'coinbaseto').bind('input propertychange', function() { updateChain(block, chain); });
+      checkBalance(block, chain);
+
+      function onChange() { updateChain(block, chain); checkBalance(block, chain); }
+
+      $('#block'+block+'chain'+chain+'number').bind('input propertychange', onChange);
+      $('#block'+block+'chain'+chain+'nonce').bind('input propertychange', onChange);
+      $('#block'+block+'chain'+chain+'coinbasevalue').bind('input propertychange', onChange);
+      $('#block'+block+'chain'+chain+'coinbaseto').bind('input propertychange', onChange);
       for (var x=0; $('#block'+block+'chain'+chain+'tx'+x+'value').length > 0; x++) {
-        $('#block'+block+'chain'+chain+'tx'+x+'value').bind('input propertychange', function() { updateChain(block, chain); });
-        $('#block'+block+'chain'+chain+'tx'+x+'from').bind('input propertychange', function() { updateChain(block, chain); });
-        $('#block'+block+'chain'+chain+'tx'+x+'to').bind('input propertychange', function() { updateChain(block, chain); });
+        $('#block'+block+'chain'+chain+'tx'+x+'value').bind('input propertychange', onChange);
+        $('#block'+block+'chain'+chain+'tx'+x+'from').bind('input propertychange', onChange);
+        $('#block'+block+'chain'+chain+'tx'+x+'to').bind('input propertychange', onChange);
       }
       $('#block'+block+'chain'+chain+'mineButton').click(function(e) {
           e.preventDefault();
+          if (!checkBalance(block, chain)) return;
           var l = Ladda.create(this);
           l.start();
           setTimeout(function() {
