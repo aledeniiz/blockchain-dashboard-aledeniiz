@@ -1,0 +1,499 @@
+extends layout
+
+block content
+  .theory-hero
+    .container
+      .theory-hero-badge Topic 7 — Hash Functions
+      h1.theory-hero-title Anatomy of a Block
+      p.theory-hero-subtitle
+        | How a Bitcoin block is structured, how blocks link into a chain,
+        | and why cryptographic hashing makes the ledger tamper-proof.
+      p.theory-hero-meta
+        | Based on: S. Nakamoto, &ldquo;Bitcoin: A Peer-to-Peer Electronic Cash System&rdquo; (2008)
+
+  .container.theory-body
+
+    //- ── Section 1: The Trust Problem ────────────────────────────────────────
+    .theory-section
+      h2.theory-section-title
+        span.theory-section-number 1
+        | The Problem: Trust Without Authority
+      .theory-callout
+        .theory-callout-quote
+          | &ldquo;What if two parties could transact directly,
+          | without the need for a trusted third party?&rdquo;
+        .theory-callout-author — Satoshi Nakamoto, Bitcoin Whitepaper (2008)
+      p
+        | The core challenge is the <strong>double-spend problem</strong>: how can we prevent
+        | someone from spending the same digital coin twice — without a bank to check the ledger?
+      p
+        | Blockchain converts a <strong>problem of trust</strong> into a
+        | <strong>mathematical problem</strong>. The solution rests on three cryptographic tools:
+      .theory-tools-grid
+        .theory-tool-card
+          .theory-tool-icon ƒ
+          h4 Hash Functions
+          p Link blocks and summarise transactions using one-way, collision-resistant functions.
+        .theory-tool-card
+          .theory-tool-icon ⧖
+          h4 Merkle Trees
+          p Compact transaction proofs using hierarchical hash integrity.
+        .theory-tool-card
+          .theory-tool-icon ⛏
+          h4 Proof of Work
+          p Make history expensive to rewrite via computational asymmetry.
+
+    //- ── Section 2: Hash Properties ─────────────────────────────────────────
+    .theory-section
+      h2.theory-section-title
+        span.theory-section-number 2
+        | Hash Functions: The Foundation
+      p
+        | Bitcoin uses <strong>double SHA-256</strong>:
+        | <code>H(x) = SHA256(SHA256(x))</code>, producing a 256-bit (64 hex character) output.
+        | This is applied to block headers, transaction identifiers, and Merkle trees.
+      .theory-props-grid
+        .theory-prop
+          .theory-prop-label P1. Deterministic
+          .theory-prop-desc Same input → always same hash. Every node on the network can independently verify results.
+        .theory-prop
+          .theory-prop-label P2. Avalanche Effect
+          .theory-prop-desc One bit change → completely different hash. Small modifications cannot be hidden.
+        .theory-prop
+          .theory-prop-label P3. Preimage Resistance
+          .theory-prop-desc Given h, infeasible to find m with H(m) = h. Hashes cannot be reversed.
+        .theory-prop
+          .theory-prop-label P4. Collision Resistance
+          .theory-prop-desc Infeasible to find m ≠ m′ with H(m) = H(m′). Two different blocks cannot share a hash.
+      .theory-avalanche
+        h4 Avalanche Effect — Try it yourself on the Hash page:
+        table.theory-table
+          thead
+            tr
+              th Input
+              th SHA-256 output (first 32 characters)
+          tbody
+            tr
+              td
+                code "Satoshi"
+              td
+                code.hash-value 54e3a30cb1b2698da3ed6e66ba...
+            tr
+              td
+                code "satoshi"
+              td
+                code.hash-value 5f70bf18a086007016e948b04a...
+        p.theory-note
+          em One letter differs (S → s) — the outputs are completely unrelated.
+
+    //- ── Section 3: Block Structure ─────────────────────────────────────────
+    .theory-section
+      h2.theory-section-title
+        span.theory-section-number 3
+        | Block Structure
+      p
+        | A Bitcoin block has two parts: a fixed-size <strong>header</strong> (80 bytes)
+        | and a variable <strong>body</strong> of transactions (up to 1 MB).
+      .theory-block-diagram
+        .theory-block-part.theory-part-header
+          .theory-block-part-label BLOCK HEADER — 80 bytes (this is what gets hashed)
+          .theory-field-row
+            .theory-field.field-version
+              .theory-field-name Version
+              .theory-field-size 4 bytes
+            .theory-field-annotation Block format version number
+          .theory-field-row
+            .theory-field.field-prev
+              .theory-field-name Previous Block Hash
+              .theory-field-size 32 bytes
+            .theory-field-annotation.annotation-key
+              span.annotation-arrow →
+              | This is what <strong>chains</strong> the blocks together
+          .theory-field-row
+            .theory-field.field-merkle
+              .theory-field-name Merkle Root
+              .theory-field-size 32 bytes
+            .theory-field-annotation.annotation-merkle
+              span.annotation-arrow →
+              | Fingerprint of <strong>all transactions</strong> in this block
+          .theory-field-row
+            .theory-field.field-time
+              .theory-field-name Timestamp
+              .theory-field-size 4 bytes
+            .theory-field-annotation Unix time when miner started working on this block
+          .theory-field-row
+            .theory-field.field-bits
+              .theory-field-name Bits (difficulty target)
+              .theory-field-size 4 bytes
+            .theory-field-annotation Compact encoding of the current mining difficulty
+          .theory-field-row
+            .theory-field.field-nonce
+              .theory-field-name Nonce
+              .theory-field-size 4 bytes
+            .theory-field-annotation.annotation-mine
+              span.annotation-arrow →
+              | <strong>Miners vary this</strong> until H(header) &lt; target
+        .theory-block-part.theory-part-body
+          .theory-block-part-label BLOCK BODY — variable (up to 1 MB)
+          .theory-field-row
+            .theory-field.field-txs
+              .theory-field-name Coinbase transaction + tx₁, tx₂, … txₙ
+              .theory-field-size ≤ 1 MB
+            .theory-field-annotation The actual financial transactions recorded
+
+      .theory-callout.callout-info
+        strong Why only the header is hashed?
+        br
+        | The 80-byte header is hashed twice per mining attempt.
+        | If the full block (up to 1 MB) were hashed, mining would be ~12,500× slower.
+        | The <strong>Merkle Root</strong> in the header already commits to all transactions —
+        | changing any transaction changes the Merkle Root, which changes the header hash.
+
+      //- Field-by-field guide
+      h3.theory-subsection-title Field-by-Field Explanation
+      .theory-field-guide
+        .theory-field-entry
+          .theory-field-entry-name.bg-version Version
+          .theory-field-entry-body
+            p A 4-byte integer indicating which set of Bitcoin protocol rules to apply. Block version 1 (2009), version 2 (BIP34, 2012), version 3 (BIP66, 2015), etc.
+        .theory-field-entry
+          .theory-field-entry-name.bg-prev Previous Block Hash
+          .theory-field-entry-body
+            p The SHA256d hash of the <em>previous block's header</em>. This is the link that creates the chain. The genesis block (block #0) uses a previous hash of all zeros.
+            .theory-mini-formula
+              | H(header<sub>n-1</sub>) → stored as prev_hash in block n
+        .theory-field-entry
+          .theory-field-entry-name.bg-merkle Merkle Root
+          .theory-field-entry-body
+            p A single 32-byte hash that represents <em>all</em> transactions in the block. It is computed bottom-up from a binary tree of transaction hashes (see Section 5). Changing even one transaction changes this root — and therefore the entire block header hash.
+        .theory-field-entry
+          .theory-field-entry-name.bg-time Timestamp
+          .theory-field-entry-body
+            p Unix time (seconds since 1 Jan 1970) when the miner began hashing this block. Used to adjust mining difficulty every 2,016 blocks (~2 weeks) to target one block per 10 minutes.
+        .theory-field-entry
+          .theory-field-entry-name.bg-bits Bits / Difficulty Target
+          .theory-field-entry-body
+            p A compact 4-byte representation of the 256-bit target T. A valid block must satisfy H(header) &lt; T. A smaller T means harder mining (more leading zeros required).
+            .theory-mini-formula
+              | Current Bitcoin: ~70 leading zero bits required ≈ 5×10²⁰ hashes per valid block
+        .theory-field-entry
+          .theory-field-entry-name.bg-nonce Nonce
+          .theory-field-entry-body
+            p A 4-byte number (0 to 4,294,967,295) that miners increment trying to find a valid hash. This is the only field miners change freely. If all ~4 billion nonces fail, miners also vary the timestamp or extra-nonce in the coinbase transaction.
+
+    //- ── Section 4: Chain Linking ────────────────────────────────────────────
+    .theory-section
+      h2.theory-section-title
+        span.theory-section-number 4
+        | Linking Blocks: The Chain
+      p
+        | Each block header contains the hash of the <strong>previous block's header</strong>.
+        | This creates an unbreakable chain: you cannot modify a past block without
+        | invalidating every block that follows.
+
+      .theory-chain-visual
+        .theory-chain-block
+          .theory-chain-block-title Block 0 — Genesis
+          .theory-chain-block-field.field-prev-display
+            span.field-label prev:
+            span.field-val.hash-zero 0000…0000
+          .theory-chain-block-field
+            span.field-label data:
+            span.field-val tx₁
+          .theory-chain-block-field
+            span.field-label nonce:
+            span.field-val n₀
+          .theory-chain-block-hash
+            span.field-label hash:
+            span.field-val.hash-value H₀
+        .theory-chain-arrow
+          .arrow-line
+          .arrow-label H₀ links →
+        .theory-chain-block
+          .theory-chain-block-title Block 1
+          .theory-chain-block-field.field-prev-display
+            span.field-label prev:
+            span.field-val.hash-link H₀
+          .theory-chain-block-field
+            span.field-label data:
+            span.field-val tx₂
+          .theory-chain-block-field
+            span.field-label nonce:
+            span.field-val n₁
+          .theory-chain-block-hash
+            span.field-label hash:
+            span.field-val.hash-value H₁
+        .theory-chain-arrow
+          .arrow-line
+          .arrow-label H₁ links →
+        .theory-chain-block
+          .theory-chain-block-title Block 2
+          .theory-chain-block-field.field-prev-display
+            span.field-label prev:
+            span.field-val.hash-link H₁
+          .theory-chain-block-field
+            span.field-label data:
+            span.field-val tx₃
+          .theory-chain-block-field
+            span.field-label nonce:
+            span.field-val n₂
+          .theory-chain-block-hash
+            span.field-label hash:
+            span.field-val.hash-value H₂
+
+      h3.theory-subsection-title Toy Numerical Example
+      p
+        | Using a simplified hash <code>h(x) = x mod 100</code>
+        | for hand calculations (not cryptographic — for illustration only):
+      table.theory-table
+        thead
+          tr
+            th Block
+            th prev
+            th data
+            th hash
+            th Computation
+        tbody
+          tr
+            td 0
+            td 00
+            td 10
+            td
+              strong 10
+            td h(00 + 10) = h(10) = 10
+          tr
+            td 1
+            td 10
+            td 20
+            td
+              strong 30
+            td h(10 + 20) = h(30) = 30
+          tr
+            td 2
+            td 30
+            td 50
+            td
+              strong 80
+            td h(30 + 50) = h(80) = 80
+
+      h3.theory-subsection-title Tamper Evidence
+      .theory-tamper-demo
+        .tamper-col
+          .tamper-header.tamper-original Original Chain
+          .tamper-block
+            | Block 0: data=10, H₀ = 10
+          .tamper-arrow ↓
+          .tamper-block
+            | Block 1: prev=10, data=20, H₁ = 30
+          .tamper-arrow ↓
+          .tamper-block
+            | Block 2: prev=30, data=50, H₂ = 80
+        .tamper-col
+          .tamper-header.tamper-attack Attacker changes Block 1 data: 20 → 21
+          .tamper-block
+            | Block 0: unchanged, H₀ = 10
+          .tamper-arrow ↓
+          .tamper-block.tamper-broken
+            | Block 1: prev=10, data=<strong>21</strong>, H₁ = <strong>31</strong> ≠ 30
+          .tamper-arrow ↓
+          .tamper-block.tamper-broken
+            | Block 2: expects prev=30, but sees 31 → <strong>INVALID</strong>
+      .theory-callout.callout-warning
+        strong Why the attacker cannot fix this silently:
+        | &nbsp;To fix Block 2, the attacker must recompute its hash — and then also redo its
+        | <strong>Proof of Work</strong> (Section 6), which takes the entire network's computing
+        | power about 10 minutes per block. With thousands of blocks in the chain,
+        | this is computationally infeasible.
+
+    //- ── Section 5: Merkle Trees ─────────────────────────────────────────────
+    .theory-section
+      h2.theory-section-title
+        span.theory-section-number 5
+        | Merkle Trees: Efficient Verification
+      p
+        | A block may contain thousands of transactions. The
+        | <strong>Merkle tree</strong> (Merkle, 1987) solves verification efficiently
+        | with a hierarchical hash structure.
+      .theory-merkle-visual
+        .merkle-level.merkle-root-level
+          .merkle-node.merkle-root
+            .merkle-node-label Root
+            .merkle-node-val H(H₁₂ ∥ H₃₄)
+        .merkle-level
+          .merkle-node.merkle-inner
+            .merkle-node-label H₁₂
+            .merkle-node-val H(h₁ ∥ h₂)
+          .merkle-connector
+          .merkle-node.merkle-inner
+            .merkle-node-label H₃₄
+            .merkle-node-val H(h₃ ∥ h₄)
+        .merkle-level
+          .merkle-node.merkle-leaf.proof-node
+            .merkle-node-label h₁
+            .merkle-node-val H(tx₁)
+          .merkle-node.merkle-leaf.proof-highlight
+            .merkle-node-label h₂
+            .merkle-node-val H(tx₂)
+          .merkle-node.merkle-leaf.proof-node
+            .merkle-node-label h₃
+            .merkle-node-val H(tx₃)
+          .merkle-node.merkle-leaf
+            .merkle-node-label h₄
+            .merkle-node-val H(tx₄)
+        .merkle-level
+          .merkle-node.merkle-tx.proof-node
+            | tx₁
+          .merkle-node.merkle-tx.proof-tx
+            | tx₂ ← verify this
+          .merkle-node.merkle-tx.proof-node
+            | tx₃
+          .merkle-node.merkle-tx
+            | tx₄
+      .theory-callout.callout-info
+        strong Merkle Proof for tx₂:
+        | &nbsp;To prove tx₂ is in the block, you only need h₁ and H₃₄ —
+        | just 2 hashes instead of all 4 transactions.
+        | For a block with 1,000,000 transactions, you need only log₂(10⁶) ≈ 20 hashes (640 bytes)
+        | instead of transmitting the entire 1 MB block.
+
+    //- ── Section 6: Proof of Work ────────────────────────────────────────────
+    .theory-section
+      h2.theory-section-title
+        span.theory-section-number 6
+        | Proof of Work: Mining
+      p
+        | Mining is the process of finding a <strong>nonce</strong> such that the block
+        | header hash is below the target T (i.e., starts with enough leading zeros):
+      .theory-formula-box
+        | Find nonce such that:&nbsp;&nbsp;
+        strong SHA256(SHA256(header ∥ nonce)) &lt; T
+      .theory-mining-steps
+        .mining-step
+          .mining-step-num 1
+          .mining-step-text Assemble the block header with current transactions and timestamp.
+        .mining-step
+          .mining-step-num 2
+          .mining-step-text Set nonce = 0. Compute H = SHA256d(header).
+        .mining-step
+          .mining-step-num 3
+          .mining-step-text Check: does H start with the required number of leading zeros?
+        .mining-step.mining-step-branch
+          .mining-step-yes
+            strong YES →
+            | Broadcast the block. Collect the block reward.
+          .mining-step-no
+            strong NO →
+            | Increment nonce by 1. Return to step 2.
+      .theory-mining-numbers
+        h4 Real Bitcoin Numbers
+        table.theory-table
+          thead
+            tr
+              th Parameter
+              th Value
+          tbody
+            tr
+              td Target block time
+              td 10 minutes
+            tr
+              td Difficulty adjustment
+              td Every 2,016 blocks (~2 weeks)
+            tr
+              td Leading zeros currently required
+              td ~70 bits
+            tr
+              td Average hashes per valid block
+              td ~5 × 10²⁰
+            tr
+              td Global network hash rate (2024)
+              td ~5 × 10²⁰ hashes/second
+
+    //- ── Section 7: Security ─────────────────────────────────────────────────
+    .theory-section
+      h2.theory-section-title
+        span.theory-section-number 7
+        | Security: The 51% Attack
+      p
+        | To rewrite history (e.g. reverse a payment), an attacker must build an
+        | <strong>alternative chain</strong> longer than the honest chain.
+        | This requires controlling more than 50% of the total network hash rate.
+      table.theory-table
+        thead
+          tr
+            th Confirmations
+            th Attacker hash rate
+            th Probability of success
+        tbody
+          tr
+            td 1
+            td 10%
+            td ~20%
+          tr
+            td 3
+            td 10%
+            td ~0.1%
+          tr
+            td 6
+            td 10%
+            td ~0.0001%
+          tr
+            td 6
+            td 30%
+            td ~0.17%
+      .theory-callout.callout-warning
+        strong The Bitcoin standard is 6 confirmations (~60 minutes).
+        | &nbsp;This reduces attack success probability to negligible levels even against well-resourced adversaries.
+
+    //- ── Section 8: Key Takeaways ────────────────────────────────────────────
+    .theory-section
+      h2.theory-section-title
+        span.theory-section-number 8
+        | Key Takeaways
+      .theory-takeaways
+        .theory-takeaway
+          .takeaway-num 1
+          .takeaway-text
+            | The <strong>80-byte header</strong> is the cryptographic core of a block.
+            | It commits to the entire block through the Merkle Root.
+        .theory-takeaway
+          .takeaway-num 2
+          .takeaway-text
+            | The <strong>Previous Hash</strong> field is the link that creates the chain.
+            | You cannot silently modify a past block.
+        .theory-takeaway
+          .takeaway-num 3
+          .takeaway-text
+            | <strong>Proof of Work</strong> makes rewriting history computationally expensive —
+            | the attacker must redo all the work done by the honest network since the target block.
+        .theory-takeaway
+          .takeaway-num 4
+          .takeaway-text
+            | <strong>Merkle trees</strong> allow lightweight nodes (phones, wallets) to verify
+            | individual transactions without downloading the full blockchain.
+        .theory-takeaway
+          .takeaway-num 5
+          .takeaway-text
+            | <strong>Hash functions</strong> tie everything together: one-way, deterministic,
+            | and with the avalanche effect that makes every field in the header matter.
+
+    //- ── Navigation ──────────────────────────────────────────────────────────
+    .theory-nav
+      p Explore each concept interactively:
+      .theory-nav-links
+        a.theory-nav-link(href='/hash')
+          span.glyphicon.glyphicon-lock
+          | &nbsp; Hash Function
+        a.theory-nav-link(href='/block')
+          span.glyphicon.glyphicon-th-large
+          | &nbsp; Block
+        a.theory-nav-link(href='/blockchain')
+          span.glyphicon.glyphicon-link
+          | &nbsp; Blockchain
+        a.theory-nav-link(href='/distributed')
+          span.glyphicon.glyphicon-globe
+          | &nbsp; Distributed
+
+    .theory-reference
+      | Reference:&nbsp;
+      a(href='https://bitcoin.org/bitcoin.pdf', target='_blank')
+        | S. Nakamoto, &ldquo;Bitcoin: A Peer-to-Peer Electronic Cash System&rdquo; (2008)

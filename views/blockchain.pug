@@ -30,6 +30,14 @@ block content
              $('#block'+block+'chain'+chain+'previous').val();
     }
 
+    // Each non-empty line of the Data textarea is treated as one transaction leaf.
+    function getMerkleLeaves(block, chain) {
+      var lines = $('#block'+block+'chain'+chain+'data').val()
+                    .split('\n')
+                    .filter(function(l) { return l.trim() !== ''; });
+      return lines.length > 0 ? lines : ['(empty block)'];
+    }
+
     function setup(block, chain) {
       updateHash(block, chain);
       $('#block'+block+'chain'+chain+'number').bind('input propertychange', function() { updateChain(block, chain); });

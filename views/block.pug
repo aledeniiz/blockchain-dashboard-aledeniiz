@@ -50,6 +50,14 @@ block content
              $('#block'+block+'chain'+chain+'data').val();
     }
 
+    // Each non-empty line of the Data textarea is treated as one transaction leaf.
+    function getMerkleLeaves(block, chain) {
+      var lines = $('#block'+block+'chain'+chain+'data').val()
+                    .split('\n')
+                    .filter(function(l) { return l.trim() !== ''; });
+      return lines.length > 0 ? lines : ['(empty block)'];
+    }
+
     function mineButtonAnimation(block, chain) {
       $('#block'+block+'chain'+chain+'mineButton').click(function(e) {
           e.preventDefault();

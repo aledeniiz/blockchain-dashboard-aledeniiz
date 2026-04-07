@@ -53,6 +53,25 @@ block content
       return s;
     }
 
+    // Coinbase transaction + each regular tx row = Merkle leaves.
+    function getMerkleLeaves(block, chain) {
+      var leaves = [];
+      // coinbase is always the first leaf
+      leaves.push(
+        'coinbase|' +
+        $('#block'+block+'chain'+chain+'coinbasevalue').val() + '|' +
+        $('#block'+block+'chain'+chain+'coinbaseto').val()
+      );
+      for (var x=0; $('#block'+block+'chain'+chain+'tx'+x+'value').length > 0; x++) {
+        leaves.push(
+          $('#block'+block+'chain'+chain+'tx'+x+'value').val() + '|' +
+          $('#block'+block+'chain'+chain+'tx'+x+'from').val()  + '|' +
+          $('#block'+block+'chain'+chain+'tx'+x+'to').val()
+        );
+      }
+      return leaves;
+    }
+
     function checkBalance(block, chain) {
       var coinbase = parseFloat($('#block'+block+'chain'+chain+'coinbasevalue').val()) || 0;
       var total = 0;

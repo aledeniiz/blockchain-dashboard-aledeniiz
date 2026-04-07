@@ -63,8 +63,42 @@ function updateState(block, chain) {
   }
 }
 
+// ── Merkle Root ───────────────────────────────────────────────────────────────
+// Computes the Merkle Root of an array of leaf strings using SHA-256.
+// Each leaf is hashed individually; pairs of hashes are combined bottom-up.
+// If the number of nodes at a level is odd, the last node is duplicated.
+function computeMerkleRoot(leaves) {
+  if (leaves.length === 0) return CryptoJS.SHA256('').toString();
+
+  var hashes = leaves.map(function(leaf) {
+    return CryptoJS.SHA256(leaf).toString();
+  });
+
+  while (hashes.length > 1) {
+    var next = [];
+    for (var i = 0; i < hashes.length; i += 2) {
+      var right = (i + 1 < hashes.length) ? hashes[i + 1] : hashes[i]; // duplicate last if odd
+      next.push(CryptoJS.SHA256(hashes[i] + right).toString());
+    }
+    hashes = next;
+  }
+
+  return hashes[0];
+}
+
+// Updates the Merkle Root display field for a given block.
+// getMerkleLeaves(block, chain) must be defined in the page's own <script>.
+function updateMerkleRoot(block, chain) {
+  var $field = $('#block' + block + 'chain' + chain + 'merkle');
+  if (!$field.length) return;
+  if (typeof getMerkleLeaves !== 'function') return;
+  $field.val(computeMerkleRoot(getMerkleLeaves(block, chain)));
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 function updateHash(block, chain) {
-  // update the SHA256 hash value for this block
+  // update Merkle Root first, then the block's SHA256 hash
+  updateMerkleRoot(block, chain);
   $('#block'+block+'chain'+chain+'hash').val(sha256(block, chain));
   updateState(block, chain);
 }

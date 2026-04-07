@@ -34,6 +34,11 @@
             .input-group-addon -&gt;
             input.form-control(id='block'+block.block+'chain'+block.chain+'tx'+x+'to', type='text', value=tx.to)
 
+    .form-group
+      label.col-sm-2.control-label.merkle-label(for='block'+block.block+'chain'+block.chain+'merkle') Merkle:
+      .col-sm-10
+        input.form-control.merkle-field(id='block'+block.block+'chain'+block.chain+'merkle', type='text', disabled, placeholder='hash of all transactions...')
+
     #state.form-group
       label.col-sm-2.control-label(for='block'+block.block+'chain'+block.chain+'previous') #{__('Prev')}:
       .col-sm-10

@@ -50,6 +50,19 @@ block content
       return s;
     }
 
+    // Each transaction row (value | from | to) is one Merkle leaf.
+    function getMerkleLeaves(block, chain) {
+      var leaves = [];
+      for (var x=0; $('#block'+block+'chain'+chain+'tx'+x+'value').length > 0; x++) {
+        leaves.push(
+          $('#block'+block+'chain'+chain+'tx'+x+'value').val() + '|' +
+          $('#block'+block+'chain'+chain+'tx'+x+'from').val()  + '|' +
+          $('#block'+block+'chain'+chain+'tx'+x+'to').val()
+        );
+      }
+      return leaves.length > 0 ? leaves : ['(no transactions)'];
+    }
+
     function setup(block, chain) {
       updateHash(block, chain);
       $('#block'+block+'chain'+chain+'number').bind('input propertychange', function() { updateChain(block, chain); });

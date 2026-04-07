@@ -15,5 +15,6 @@
 	"Tx": "Tx",
 	"$": "$",
 	"From": "De",
-	"Coinbase Transactions": "Transacciones Coinbase"
+	"Coinbase Transactions": "Transacciones Coinbase",
+	"Theory": "Theory"
 }
