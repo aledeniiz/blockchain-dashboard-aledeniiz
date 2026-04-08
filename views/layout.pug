@@ -41,23 +41,43 @@ html
           a.navbar-brand(href='/') #{__('Blockchain Demo')}
         #navbar.collapse.navbar-collapse
           ul.nav.navbar-nav.navbar-right
-            li(class={active: page === 'hash'})
-              a(href='/hash') #{__('Hash')}
-            li(class={active: page === 'block'})
-              a(href='/block') #{__('Block')}
-            li(class={active: page === 'blockchain'})
-              a(href='/blockchain') #{__('Blockchain')}
-            li(class={active: page === 'distributed'})
-              a(href='/distributed') #{__('Distributed')}
-            li(class={active: page === 'tokens'})
-              a(href='/tokens') #{__('Tokens')}
-            li(class={active: page === 'coinbase'})
-              a(href='/coinbase') #{__('Coinbase')}
+            li.dropdown(class={active: page === 'hash' || page === 'block' || page === 'blockchain' || page === 'distributed' || page === 'tokens' || page === 'coinbase'})
+              a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                | Blockchain
+                span.caret
+              ul.dropdown-menu
+                li.dropdown-header Core Modules
+                li(class={active: page === 'hash'})
+                  a(href='/hash') # #{__('Hash')}
+                li(class={active: page === 'block'})
+                  a(href='/block') ☐ #{__('Block')}
+                li(class={active: page === 'blockchain'})
+                  a(href='/blockchain') ⛓ #{__('Blockchain')}
+                li(class={active: page === 'distributed'})
+                  a(href='/distributed') 🌐 #{__('Distributed')}
+                li.divider(role='separator')
+                li.dropdown-header Transactions
+                li(class={active: page === 'tokens'})
+                  a(href='/tokens') ⇄ #{__('Tokens')}
+                li(class={active: page === 'coinbase'})
+                  a(href='/coinbase') ★ #{__('Coinbase')}
+            li.dropdown(class={active: page === 'bitcoinblock' || page === 'attack51' || page === 'mempool'})
+              a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                | ₿ Bitcoin
+                span.caret
+              ul.dropdown-menu
+                li.dropdown-header Advanced
+                li(class={active: page === 'bitcoinblock'})
+                  a(href='/bitcoinblock') ₿ Real Bitcoin Block
+                li(class={active: page === 'attack51'})
+                  a(href='/attack51') ⚔ 51% Attack Simulator
+                li(class={active: page === 'mempool'})
+                  a(href='/mempool') 📨 Mempool &amp; Fees
             li(class={active: page === 'theory'})
               a(href='/theory') #{__('Theory')}
             li.dropdown(class={active: page === 'keys' || page === 'signatures' || page === 'transaction'})
               a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                | Keys &amp; Signing
+                | 🔑 Keys
                 span.caret
               ul.dropdown-menu.dropdown-menu-right
                 li.dropdown-header Public / Private Key Cryptography

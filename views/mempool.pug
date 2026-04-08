@@ -1,0 +1,516 @@
+extends layout
+
+block content
+  .container
+
+    // ── Hero ──────────────────────────────────────────────────────────────────
+    .mp-hero
+      .mp-hero-badge 📨 Mempool & Fees
+      h1.mp-hero-title The Transaction Queue
+      p.mp-hero-subtitle
+        | Before a transaction enters a block, it waits in the
+        strong  Memory Pool (Mempool)
+        | — a shared queue held by every node.
+        | Miners pick transactions to maximise their fee income.
+        | This demo lets you be the miner.
+
+    // ── Concept ───────────────────────────────────────────────────────────────
+    .mp-card
+      .mp-card-header
+        span.mp-card-icon 💡
+        div
+          h2.mp-card-title How the Mempool Works
+          p.mp-card-subtitle The journey from wallet to confirmed block
+
+      .mp-concept-steps
+        .mp-concept-step
+          .mp-concept-num 1
+          .mp-concept-title Broadcast
+          .mp-concept-body
+            | Alice signs a transaction and broadcasts it to the network.
+            | Every full node validates it and adds it to their local mempool.
+        .mp-concept-step
+          .mp-concept-num 2
+          .mp-concept-title Wait
+          .mp-concept-body
+            | The transaction sits in the mempool competing with hundreds of others.
+            | Nodes order them by
+            strong  fee rate (sat/vByte)
+            | .
+        .mp-concept-step
+          .mp-concept-num 3
+          .mp-concept-title Miner selects
+          .mp-concept-body
+            | When a miner builds a block, they pick the
+            strong  highest-fee transactions
+            |  that fit within the 1 MB block size limit (≈ 2,000–3,000 txs).
+        .mp-concept-step
+          .mp-concept-num 4
+          .mp-concept-title Confirmed
+          .mp-concept-body
+            | Once included in a mined block, the transaction has
+            strong  1 confirmation.
+            |  Each additional block on top adds one more confirmation.
+
+    // ── Main simulator ────────────────────────────────────────────────────────
+    .mp-sim-layout
+
+      // Left: Mempool
+      .mp-panel.mp-panel-mempool
+        .mp-panel-header
+          h3.mp-panel-title
+            span 📨
+            |  Mempool
+            span.mp-counter#mpMempoolCount  (0 txs)
+          .mp-panel-controls
+            button.btn.btn-xs.btn-default#mpAddTxBtn + Add TX
+            button.btn.btn-xs.btn-default#mpAddBatchBtn + Batch (10)
+            button.btn.btn-xs.btn-danger#mpClearBtn Clear
+        .mp-fee-filter
+          label Fee filter:
+          input#mpFeeFilter(type='range', min='1', max='500', value='1', step='1')
+          span#mpFeeFilterVal  ≥ 1 sat/vB
+        .mp-tx-list#mpTxList
+          .mp-empty-hint Mempool is empty — add some transactions above.
+
+      // Middle: controls
+      .mp-actions
+        .mp-block-info
+          .mp-block-label Block size limit
+          .mp-block-val 1,000,000 bytes
+          .mp-block-label Txs in next block
+          .mp-block-val#mpBlockTxCount 0 / ~2500 max
+          .mp-block-label Total fees
+          .mp-block-val#mpBlockFees 0 sat
+          .mp-block-label Fee rate range
+          .mp-block-val#mpFeeRange —
+        .mp-sort-group
+          p.mp-sort-label Sort mempool by:
+          .btn-group.btn-group-justified
+            a.btn.btn-sm.btn-default.mp-sort-btn.active(data-sort='fee') Fee rate
+            a.btn.btn-sm.btn-default.mp-sort-btn(data-sort='value') Value
+            a.btn.btn-sm.btn-default.mp-sort-btn(data-sort='age') Age
+        button.btn.btn-success.mp-mine-btn#mpMineBtn(disabled)
+          | ⛏ Mine Block
+          br
+          small Select highest-fee txs
+        .mp-mine-result#mpMineResult(style='display:none')
+
+      // Right: Confirmed block
+      .mp-panel.mp-panel-block
+        .mp-panel-header
+          h3.mp-panel-title
+            span 📦
+            |  Confirmed Block
+            span.mp-counter#mpBlockCount  (empty)
+        .mp-tx-list#mpBlockList
+          .mp-empty-hint Mine a block to see confirmed transactions here.
+
+    // ── Fee chart ─────────────────────────────────────────────────────────────
+    .mp-card
+      .mp-card-header
+        span.mp-card-icon 📊
+        div
+          h2.mp-card-title Fee Distribution
+          p.mp-card-subtitle How many transactions sit at each fee tier (sat/vByte)
+
+      .mp-chart-wrap
+        canvas#mpFeeChart(width='800', height='180')
+
+    // ── Fee bumping ────────────────────────────────────────────────────────────
+    .mp-card
+      .mp-card-header
+        span.mp-card-icon 🚀
+        div
+          h2.mp-card-title Fee Bumping: RBF (Replace-By-Fee)
+          p.mp-card-subtitle Stuck transaction? Pay a higher fee to jump the queue
+
+      p.mp-rbf-desc
+        | If a transaction has been in the mempool too long (low fee), Bitcoin allows replacing it with a new version
+        | that has a higher fee.
+        | Select a pending transaction below and click &ldquo;Bump Fee&rdquo; to see it jump to the top.
+
+      .mp-rbf-row
+        .mp-rbf-col
+          label.mp-rbf-label Select stuck transaction:
+          select.form-control#mpRbfSelect
+            option(value='') — choose a mempool tx —
+          button.btn.btn-warning#mpRbfBtn(disabled) 🚀 Bump Fee (+50 sat/vB)
+        .mp-rbf-col
+          .mp-rbf-result#mpRbfResult
+
+    // ── Key facts ─────────────────────────────────────────────────────────────
+    .mp-card
+      .mp-card-header
+        span.mp-card-icon 📌
+        div
+          h2.mp-card-title Key Facts
+          p.mp-card-subtitle Real Bitcoin mempool numbers
+
+      .mp-facts-grid
+        .mp-fact
+          .mp-fact-icon ⏱
+          h4 Confirmation time
+          p
+            | At 1 sat/vB your transaction may wait days.
+            | At 50+ sat/vB it typically confirms in the next block (~10 min).
+        .mp-fact
+          .mp-fact-icon 📈
+          h4 Fee spikes
+          p
+            | During high-demand periods (NFT mints, market crashes), fees can exceed
+            strong  1,000 sat/vB.
+            |  The mempool can hold over 100,000 unconfirmed transactions.
+        .mp-fact
+          .mp-fact-icon 🗑
+          h4 Eviction
+          p
+            | Most nodes set a mempool size limit (~300 MB).
+            | Transactions below the minimum fee rate get evicted — they simply disappear.
+        .mp-fact
+          .mp-fact-icon 💡
+          h4 Lightning Network
+          p
+            | The Lightning Network was created partly to solve high fees:
+            | route micropayments off-chain through payment channels,
+            | settling only the final balance on-chain.
+
+  script.
+    // ══════════════════════════════════════════════════════════════════════════
+    //  MEMPOOL SIMULATOR
+    // ══════════════════════════════════════════════════════════════════════════
+
+    var BLOCK_SIZE    = 1000000;   // bytes
+    var AVG_TX_SIZE   = 400;       // vBytes per average tx
+    var MAX_BLOCK_TXS = Math.floor(BLOCK_SIZE / AVG_TX_SIZE); // ~2500
+
+    var mempool    = [];   // { id, from, to, value, fee, feeRate, size, age }
+    var confirmed  = [];   // txs included in the last mined block
+    var sortMode   = 'fee';
+    var txIdCounter = 0;
+    var ageTimer;
+
+    // ── Random tx generator ───────────────────────────────────────────────────
+    var NAMES = ['Alice','Bob','Carol','Dave','Eve','Frank','Grace','Heidi',
+                 'Ivan','Judy','Mallory','Niaj','Olivia','Pat','Quinn','Rita'];
+
+    function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+
+    function randomAddress() {
+      return '1' + CryptoJS.SHA256(Math.random().toString()).toString().substring(0, 10);
+    }
+
+    function makeTx(feeRateOverride) {
+      var size    = rnd(200, 800);
+      var feeRate = feeRateOverride !== undefined ? feeRateOverride : rnd(1, 300);
+      var fee     = Math.round(size * feeRate);
+      var value   = rnd(10000, 500000000); // satoshis
+      txIdCounter++;
+      return {
+        id      : txIdCounter,
+        from    : NAMES[rnd(0, NAMES.length - 1)],
+        to      : NAMES[rnd(0, NAMES.length - 1)],
+        value   : value,
+        fee     : fee,
+        feeRate : feeRate,
+        size    : size,
+        age     : 0,
+        txid    : CryptoJS.SHA256('tx' + txIdCounter + Math.random()).toString().substring(0, 16)
+      };
+    }
+
+    // ── Add transactions ──────────────────────────────────────────────────────
+    function addTx(feeRate) {
+      mempool.push(makeTx(feeRate));
+      refreshMempool();
+    }
+
+    function addBatch() {
+      for (var i = 0; i < 10; i++) mempool.push(makeTx());
+      refreshMempool();
+    }
+
+    // ── Sort ──────────────────────────────────────────────────────────────────
+    function sortedMempool() {
+      var copy = mempool.slice();
+      if (sortMode === 'fee')   copy.sort(function(a,b){ return b.feeRate - a.feeRate; });
+      if (sortMode === 'value') copy.sort(function(a,b){ return b.value   - a.value;   });
+      if (sortMode === 'age')   copy.sort(function(a,b){ return b.age     - a.age;     });
+      return copy;
+    }
+
+    // ── Format helpers ────────────────────────────────────────────────────────
+    function satBtc(sat) {
+      return (sat / 1e8).toFixed(6) + ' BTC';
+    }
+
+    function feeColor(rate) {
+      if (rate >= 100) return '#c62828';
+      if (rate >= 50)  return '#e65100';
+      if (rate >= 20)  return '#f57f17';
+      if (rate >= 5)   return '#2e7d32';
+      return '#546e7a';
+    }
+
+    function feeLabel(rate) {
+      if (rate >= 100) return 'Priority';
+      if (rate >= 50)  return 'High';
+      if (rate >= 20)  return 'Medium';
+      if (rate >= 5)   return 'Low';
+      return 'Dust';
+    }
+
+    // ── Render mempool list ───────────────────────────────────────────────────
+    var minFeeFilter = 1;
+
+    function refreshMempool() {
+      var sorted   = sortedMempool();
+      var filtered = sorted.filter(function(t){ return t.feeRate >= minFeeFilter; });
+      var html     = '';
+
+      if (filtered.length === 0) {
+        html = '<div class="mp-empty-hint">No transactions match the fee filter.</div>';
+      } else {
+        filtered.forEach(function(tx) {
+          var col = feeColor(tx.feeRate);
+          html += '<div class="mp-tx" data-id="' + tx.id + '">';
+          html += '  <div class="mp-tx-top">';
+          html += '    <span class="mp-tx-id">' + tx.txid + '…</span>';
+          html += '    <span class="mp-tx-fee-badge" style="background:' + col + '">' +
+                        tx.feeRate + ' sat/vB — ' + feeLabel(tx.feeRate) + '</span>';
+          html += '  </div>';
+          html += '  <div class="mp-tx-body">';
+          html += '    <span class="mp-tx-parties">' + tx.from + ' → ' + tx.to + '</span>';
+          html += '    <span class="mp-tx-value">' + satBtc(tx.value) + '</span>';
+          html += '    <span class="mp-tx-meta">' + tx.size + ' vB · ' + tx.fee + ' sat · ' + tx.age + 's old</span>';
+          html += '  </div>';
+          html += '</div>';
+        });
+      }
+
+      $('#mpTxList').html(html);
+      $('#mpMempoolCount').text(' (' + filtered.length + ' tx' + (filtered.length !== 1 ? 's' : '') + ')');
+
+      // Compute what fits in the next block
+      updateBlockPreview(sorted);
+      updateRbfSelect(sorted);
+      updateFeeChart(sorted);
+      updateMineBtn(sorted);
+    }
+
+    // ── Block preview (greedy by fee rate) ───────────────────────────────────
+    function blockSelection(sorted) {
+      var selected = [], size = 0;
+      for (var i = 0; i < sorted.length; i++) {
+        if (size + sorted[i].size <= BLOCK_SIZE) {
+          selected.push(sorted[i]);
+          size += sorted[i].size;
+        }
+        if (selected.length >= MAX_BLOCK_TXS) break;
+      }
+      return selected;
+    }
+
+    function updateBlockPreview(sorted) {
+      var sel   = blockSelection(sorted);
+      var total = sel.reduce(function(s, t){ return s + t.fee; }, 0);
+      var rates = sel.map(function(t){ return t.feeRate; });
+      var minR  = rates.length ? Math.min.apply(null, rates) : 0;
+      var maxR  = rates.length ? Math.max.apply(null, rates) : 0;
+
+      $('#mpBlockTxCount').text(sel.length + ' / ~' + MAX_BLOCK_TXS + ' max');
+      $('#mpBlockFees').text(total.toLocaleString() + ' sat (' + satBtc(total) + ')');
+      $('#mpFeeRange').text(sel.length ? minR + ' – ' + maxR + ' sat/vB' : '—');
+    }
+
+    function updateMineBtn(sorted) {
+      $('#mpMineBtn').prop('disabled', sorted.length === 0);
+    }
+
+    // ── Mine block ────────────────────────────────────────────────────────────
+    function mineBlock() {
+      var sorted = sortedMempool().sort(function(a,b){ return b.feeRate - a.feeRate; });
+      var sel    = blockSelection(sorted);
+      if (sel.length === 0) return;
+
+      var totalFee   = sel.reduce(function(s,t){ return s + t.fee; }, 0);
+      var blockReward = 312500000; // 3.125 BTC in satoshis
+      var selIds = {};
+      sel.forEach(function(t){ selIds[t.id] = true; });
+
+      confirmed = sel;
+      mempool   = mempool.filter(function(t){ return !selIds[t.id]; });
+
+      // Render confirmed block
+      var html = '';
+      confirmed.forEach(function(tx, idx) {
+        html += '<div class="mp-tx mp-tx-confirmed">';
+        html += '  <div class="mp-tx-top">';
+        html += '    <span class="mp-tx-id">' + tx.txid + '…</span>';
+        html += '    <span class="mp-tx-fee-badge" style="background:' + feeColor(tx.feeRate) + '">' + tx.feeRate + ' sat/vB</span>';
+        html += '  </div>';
+        html += '  <div class="mp-tx-body">';
+        html += '    <span class="mp-tx-parties">' + tx.from + ' → ' + tx.to + '</span>';
+        html += '    <span class="mp-tx-value">' + satBtc(tx.value) + '</span>';
+        html += '  </div>';
+        html += '</div>';
+      });
+      $('#mpBlockList').html(html);
+      $('#mpBlockCount').text(' (' + confirmed.length + ' txs)');
+
+      // Mine result banner
+      var minerIncome = totalFee + blockReward;
+      $('#mpMineResult').show().html(
+        '<div class="mp-mine-banner">' +
+        '  <div class="mp-mine-banner-title">⛏ Block mined!</div>' +
+        '  <div class="mp-mine-banner-row"><span>Transactions included:</span><strong>' + sel.length + '</strong></div>' +
+        '  <div class="mp-mine-banner-row"><span>Total fees collected:</span><strong>' + totalFee.toLocaleString() + ' sat</strong></div>' +
+        '  <div class="mp-mine-banner-row"><span>Block subsidy:</span><strong>' + satBtc(blockReward) + '</strong></div>' +
+        '  <div class="mp-mine-banner-row mp-mine-total"><span>Total miner income:</span><strong>' + satBtc(minerIncome) + '</strong></div>' +
+        '</div>'
+      );
+
+      refreshMempool();
+    }
+
+    // ── Fee chart (canvas bar chart) ──────────────────────────────────────────
+    var BUCKETS = [
+      { label: '1-4',   min: 1,   max: 4   },
+      { label: '5-9',   min: 5,   max: 9   },
+      { label: '10-19', min: 10,  max: 19  },
+      { label: '20-49', min: 20,  max: 49  },
+      { label: '50-99', min: 50,  max: 99  },
+      { label: '100+',  min: 100, max: 9999}
+    ];
+    var BUCKET_COLORS = ['#546e7a','#2e7d32','#f57f17','#e65100','#c62828','#7b1fa2'];
+
+    function updateFeeChart(sorted) {
+      var canvas = document.getElementById('mpFeeChart');
+      if (!canvas || !canvas.getContext) return;
+      var ctx = canvas.getContext('2d');
+      var W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      var counts = BUCKETS.map(function(b) {
+        return sorted.filter(function(t){ return t.feeRate >= b.min && t.feeRate <= b.max; }).length;
+      });
+      var maxCount = Math.max.apply(null, counts.concat([1]));
+      var barW = Math.floor((W - 60) / BUCKETS.length) - 6;
+      var padL = 50, padB = 40, padT = 20;
+      var chartH = H - padB - padT;
+
+      // Y-axis
+      ctx.strokeStyle = '#ccc';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padL, padT); ctx.lineTo(padL, H - padB);
+      ctx.stroke();
+
+      // X-axis
+      ctx.beginPath();
+      ctx.moveTo(padL, H - padB); ctx.lineTo(W, H - padB);
+      ctx.stroke();
+
+      // Y ticks
+      ctx.fillStyle = '#888';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'right';
+      for (var y = 0; y <= 4; y++) {
+        var val = Math.round(maxCount * y / 4);
+        var py  = H - padB - Math.round(chartH * y / 4);
+        ctx.fillText(val, padL - 4, py + 3);
+        ctx.strokeStyle = '#eee';
+        ctx.beginPath(); ctx.moveTo(padL, py); ctx.lineTo(W, py); ctx.stroke();
+      }
+
+      // Bars
+      for (var i = 0; i < BUCKETS.length; i++) {
+        var bx = padL + 10 + i * (barW + 6);
+        var bh = counts[i] > 0 ? Math.max(2, Math.round(chartH * counts[i] / maxCount)) : 0;
+        var by = H - padB - bh;
+        ctx.fillStyle = BUCKET_COLORS[i];
+        ctx.fillRect(bx, by, barW, bh);
+        // label
+        ctx.fillStyle = '#555';
+        ctx.font = '9px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(BUCKETS[i].label, bx + barW / 2, H - padB + 12);
+        ctx.fillText('sat/vB', bx + barW / 2, H - padB + 22);
+        if (counts[i] > 0) {
+          ctx.fillStyle = '#333';
+          ctx.font = 'bold 10px monospace';
+          ctx.fillText(counts[i], bx + barW / 2, by - 4);
+        }
+      }
+    }
+
+    // ── RBF ───────────────────────────────────────────────────────────────────
+    function updateRbfSelect(sorted) {
+      var opts = '<option value="">— choose a mempool tx —</option>';
+      sorted.slice(0, 30).forEach(function(tx) {
+        opts += '<option value="' + tx.id + '">' + tx.txid + '… (' + tx.feeRate + ' sat/vB)</option>';
+      });
+      $('#mpRbfSelect').html(opts);
+      $('#mpRbfBtn').prop('disabled', sorted.length === 0);
+    }
+
+    function bumpFee() {
+      var id  = parseInt($('#mpRbfSelect').val());
+      if (!id) return;
+      var idx = mempool.findIndex(function(t){ return t.id === id; });
+      if (idx === -1) return;
+      var old  = mempool[idx];
+      var bump = old.feeRate + 50;
+      // Replace in place
+      mempool[idx] = Object.assign({}, old, {
+        feeRate : bump,
+        fee     : Math.round(old.size * bump),
+        txid    : old.txid // same txid for demo
+      });
+      $('#mpRbfResult').html(
+        '<div class="mp-rbf-ok">✓ Fee bumped from <strong>' + old.feeRate + '</strong> → <strong>' + bump + '</strong> sat/vB. ' +
+        'Transaction moved to the top of the queue.</div>'
+      );
+      refreshMempool();
+    }
+
+    // ── Age ticker ────────────────────────────────────────────────────────────
+    function tickAge() {
+      mempool.forEach(function(t){ t.age++; });
+      if (mempool.length > 0) refreshMempool();
+    }
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    $(function() {
+      // Seed with 15 random txs
+      for (var i = 0; i < 15; i++) mempool.push(makeTx());
+      refreshMempool();
+      ageTimer = setInterval(tickAge, 1000);
+
+      $('#mpAddTxBtn').click(function(){ addTx(); });
+      $('#mpAddBatchBtn').click(addBatch);
+      $('#mpClearBtn').click(function(){
+        mempool = [];
+        $('#mpMineResult').hide();
+        refreshMempool();
+      });
+      $('#mpMineBtn').click(mineBlock);
+      $('#mpRbfBtn').click(bumpFee);
+
+      $('#mpFeeFilter').on('input', function() {
+        minFeeFilter = parseInt($(this).val());
+        $('#mpFeeFilterVal').text(' ≥ ' + minFeeFilter + ' sat/vB');
+        refreshMempool();
+      });
+
+      $(document).on('click', '.mp-sort-btn', function() {
+        sortMode = $(this).data('sort');
+        $('.mp-sort-btn').removeClass('active');
+        $(this).addClass('active');
+        refreshMempool();
+      });
+
+      $('#mpRbfSelect').on('change', function() {
+        $('#mpRbfBtn').prop('disabled', !$(this).val());
+      });
+    });

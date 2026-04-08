@@ -62,6 +62,30 @@ block content
             | Add a special coinbase transaction that creates new coins from nothing —
             | the mechanism by which miners are rewarded.
       .col-sm-6.col-md-4
+        a.home-card.home-card-mempool(href='/mempool')
+          .home-card-icon.home-card-icon-mempool
+            span 📨
+          h3 Mempool &amp; Fees
+          p
+            | Simulate the transaction queue. Be the miner — pick the highest-fee transactions,
+            | fill a block, and collect your reward. Try RBF fee bumping.
+      .col-sm-6.col-md-4
+        a.home-card.home-card-attack(href='/attack51')
+          .home-card-icon.home-card-icon-attack
+            span ⚔
+          h3 51% Attack
+          p
+            | Simulate a double-spend attack step by step.
+            | Choose the attacker's hash power and see whether the honest network survives.
+      .col-sm-6.col-md-4
+        a.home-card.home-card-bitcoin(href='/bitcoinblock')
+          .home-card-icon.home-card-icon-bitcoin
+            span ₿
+          h3 Real Bitcoin Block
+          p
+            | Explore the actual 80-byte header of the Genesis Block.
+            | Verify Satoshi&rsquo;s double-SHA256 hash live in the browser and mine your own valid block.
+      .col-sm-6.col-md-4
         a.home-card.home-card-theory(href='/theory')
           .home-card-icon.home-card-icon-theory
             span.glyphicon.glyphicon-education

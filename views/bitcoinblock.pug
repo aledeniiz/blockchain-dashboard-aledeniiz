@@ -1,0 +1,453 @@
+extends layout
+
+block content
+  .container
+    // ── Hero ──────────────────────────────────────────────────────────────────
+    .btc-hero
+      .btc-hero-badge ₿ Bitcoin Network
+      h1.btc-hero-title Real Bitcoin Block
+      p.btc-hero-subtitle
+        | The exact 80-byte structure that every Bitcoin miner hashes billions of times per second.
+        | Every field is editable — see how changing even one bit invalidates the block.
+      .btc-stats-row
+        .btc-stat
+          .btc-stat-label Block Height
+          .btc-stat-value &#35;0
+        .btc-stat
+          .btc-stat-label Date
+          .btc-stat-value Jan 3, 2009
+        .btc-stat
+          .btc-stat-label Transactions
+          .btc-stat-value 1 tx
+        .btc-stat
+          .btc-stat-label Block Reward
+          .btc-stat-value 50 BTC
+        .btc-stat
+          .btc-stat-label Difficulty
+          .btc-stat-value 1.00
+
+    // ── Section 1: Header Fields ─────────────────────────────────────────────
+    .btc-card
+      .btc-card-header
+        span.btc-card-icon ⛏
+        div
+          h2.btc-card-title Block Header Fields
+          p.btc-card-subtitle 80 bytes — the only data that gets hashed during mining
+
+      .btc-fields-grid
+
+        .btc-field
+          label.btc-field-label
+            span.btc-field-num 4 bytes &mdash;
+            | Version
+          input.btc-input#btcVersion(type='number', value='1', min='1')
+          .btc-field-hint Current Bitcoin blocks use version 4 (0x20000000 with BIP9 signalling)
+
+        .btc-field.btc-field-wide
+          label.btc-field-label
+            span.btc-field-num 32 bytes &mdash;
+            | Previous Block Hash
+          input.btc-input.btc-mono#btcPrevHash(type='text', value='0000000000000000000000000000000000000000000000000000000000000000')
+          .btc-field-hint Genesis block: all zeros — there is no previous block
+
+        .btc-field.btc-field-wide
+          label.btc-field-label
+            span.btc-field-num 32 bytes &mdash;
+            | Merkle Root
+          input.btc-input.btc-mono#btcMerkle(type='text', value='4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b')
+          .btc-field-hint Root of the Merkle tree of all transactions. Genesis has 1 tx → Merkle root = tx hash.
+
+        .btc-field
+          label.btc-field-label
+            span.btc-field-num 4 bytes &mdash;
+            | Timestamp (Unix)
+          input.btc-input#btcTimestamp(type='number', value='1231006505')
+          .btc-field-hint.btc-timestamp-display#btcTimestampDisplay —
+
+        .btc-field
+          label.btc-field-label
+            span.btc-field-num 4 bytes &mdash;
+            | Bits (Compact Target)
+          input.btc-input.btc-mono#btcBits(type='text', value='1d00ffff')
+          .btc-field-hint Compact encoding of the proof-of-work difficulty target
+
+        .btc-field
+          label.btc-field-label
+            span.btc-field-num 4 bytes &mdash;
+            | Nonce
+          input.btc-input#btcNonce(type='number', value='2083236893', min='0', max='4294967295')
+          .btc-field-hint The only field miners are free to vary (0 – 4,294,967,295)
+
+      .btc-result-bar
+        .btc-result-label Block Hash (SHA256d):
+        .btc-result-hash.btc-mono#btcBlockHash —
+        span.btc-result-badge#btcValidBadge
+
+    // ── Section 2: 80-byte Header Hex Dump ──────────────────────────────────
+    .btc-card
+      .btc-card-header
+        span.btc-card-icon 📦
+        div
+          h2.btc-card-title 80-byte Header (Raw Hex)
+          p.btc-card-subtitle Stored little-endian — this exact byte sequence is what gets hashed
+
+      .btc-hex-legend
+        span.btc-legend-item
+          span.btc-swatch.btc-swatch-version
+          | Version
+        span.btc-legend-item
+          span.btc-swatch.btc-swatch-prevhash
+          | Prev Hash
+        span.btc-legend-item
+          span.btc-swatch.btc-swatch-merkle
+          | Merkle Root
+        span.btc-legend-item
+          span.btc-swatch.btc-swatch-timestamp
+          | Timestamp
+        span.btc-legend-item
+          span.btc-swatch.btc-swatch-bits
+          | Bits
+        span.btc-legend-item
+          span.btc-swatch.btc-swatch-nonce
+          | Nonce
+
+      .btc-hex-dump#btcHexDump Loading…
+
+    // ── Section 3: SHA256d Pipeline ──────────────────────────────────────────
+    .btc-card
+      .btc-card-header
+        span.btc-card-icon &#35;
+        div
+          h2.btc-card-title Hash Computation: SHA256d
+          p.btc-card-subtitle Bitcoin applies SHA-256 twice, then reverses the byte order for display
+
+      .btc-pipeline
+        .btc-pipe-step
+          .btc-pipe-tag Input (80 bytes)
+          .btc-pipe-value.btc-mono#btcStep0 —
+        .btc-pipe-arrow ↓ SHA-256
+        .btc-pipe-step
+          .btc-pipe-tag First hash: SHA256(header)
+          .btc-pipe-value.btc-mono#btcStep1 —
+        .btc-pipe-arrow ↓ SHA-256 again
+        .btc-pipe-step
+          .btc-pipe-tag Second hash: SHA256(SHA256(header))
+          .btc-pipe-value.btc-mono#btcStep2 —
+        .btc-pipe-arrow ↓ Reverse byte order
+        .btc-pipe-step.btc-pipe-final
+          .btc-pipe-tag Block Hash (as shown in explorers)
+          .btc-pipe-value.btc-mono#btcStep3 —
+
+    // ── Section 4: Proof of Work ─────────────────────────────────────────────
+    .btc-card
+      .btc-card-header
+        span.btc-card-icon 🎯
+        div
+          h2.btc-card-title Proof of Work Validation
+          p.btc-card-subtitle The block hash must be ≤ the target. If the hash is larger, the block is rejected.
+
+      .btc-pow-row
+        .btc-pow-col
+          .btc-pow-label Target (decoded from Bits field)
+          .btc-pow-value.btc-mono.btc-pow-target#btcTargetHex —
+        .btc-pow-col
+          .btc-pow-label Block Hash
+          .btc-pow-value.btc-mono.btc-pow-hash#btcHashHex2 —
+      .btc-pow-result#btcPowResult
+        span.btc-pow-icon ⬜
+        span.btc-pow-text Computing…
+
+    // ── Section 5: Mining Demo ───────────────────────────────────────────────
+    .btc-card
+      .btc-card-header
+        span.btc-card-icon ⛏
+        div
+          h2.btc-card-title Mining Simulation
+          p.btc-card-subtitle Iterate the nonce from 0 until SHA256d(header) ≤ target
+
+      p.btc-mining-desc
+        | Miners have only one variable they control: the nonce (4 bytes = ~4 billion possibilities).
+        | The genesis block uses difficulty 1 — the easiest possible target.
+        strong  Try it: click Mine and watch the nonce increment in real time until a valid hash is found.
+        | Change the Bits field to make it harder.
+
+      .btc-mine-controls
+        button.btn.btn-warning.btc-mine-btn#btcMineBtn ⛏ Mine (vary nonce)
+        button.btn.btn-default.btc-reset-btn#btcResetBtn ↺ Reset to Genesis
+      .btc-mine-stats#btcMineStats(style='display:none')
+
+    // ── Section 6: Genesis Coinbase TX ──────────────────────────────────────
+    .btc-card
+      .btc-card-header
+        span.btc-card-icon 📜
+        div
+          h2.btc-card-title Genesis Coinbase Transaction
+          p.btc-card-subtitle The only transaction in block #0 — embedded by Satoshi Nakamoto
+
+      .btc-coinbase-box
+        .btc-coinbase-quote-text
+          | &ldquo;The Times 03/Jan/2009 Chancellor on brink of second bailout for banks&rdquo;
+        .btc-coinbase-source — The Times, front page headline, January 3, 2009
+
+      .row
+        .col-sm-6
+          .btc-tx-row
+            .btc-tx-label TX Hash
+            .btc-tx-val.btc-mono.btc-small 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b
+          .btc-tx-row
+            .btc-tx-label Block Reward
+            .btc-tx-val 50.00000000 BTC
+          .btc-tx-row
+            .btc-tx-label Recipient
+            .btc-tx-val.btc-mono 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
+          .btc-tx-row
+            .btc-tx-label Inputs
+            .btc-tx-val None (coinbase — coins created from thin air)
+        .col-sm-6
+          .btc-tx-row
+            .btc-tx-label Coinbase Script (hex)
+            .btc-tx-val.btc-mono.btc-small
+              | 04ffff001d0104455468652054696d65732030332f4a616e2f32303039
+              | 204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e
+              | 64206261696c6f757420666f722062616e6b73
+          .btc-note
+            strong Note:&nbsp;
+            | Coinbase transactions have no real &ldquo;from&rdquo; address. The miner is
+            | allowed to create coins limited to the block subsidy — 50 BTC in 2009,
+            | halved every 210,000 blocks. Today (2024) the subsidy is 3.125 BTC.
+
+  script.
+    // ── Genesis Block Constants ──────────────────────────────────────────────
+    var GENESIS = {
+      version   : 1,
+      prevHash  : '0000000000000000000000000000000000000000000000000000000000000000',
+      merkle    : '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
+      timestamp : 1231006505,
+      bits      : '1d00ffff',
+      nonce     : 2083236893
+    };
+
+    // ── Utility helpers ──────────────────────────────────────────────────────
+    function reverseHex(hex) {
+      var r = '';
+      for (var i = hex.length - 2; i >= 0; i -= 2) r += hex.substr(i, 2);
+      return r;
+    }
+
+    function uint32LE(n) {
+      var b = n >>> 0;
+      return [b & 0xff, (b >> 8) & 0xff, (b >> 16) & 0xff, (b >> 24) & 0xff]
+        .map(function(x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+    }
+
+    function padHex(val, len) {
+      return (val + '').toLowerCase().replace(/\s/g, '').padEnd(len, '0').slice(0, len);
+    }
+
+    // ── Pack the 80-byte Bitcoin block header as a hex string (LE) ──────────
+    function packHeaderHex() {
+      var version   = parseInt($('#btcVersion').val())   || 1;
+      var prevHash  = padHex($('#btcPrevHash').val(),  64);
+      var merkle    = padHex($('#btcMerkle').val(),    64);
+      var timestamp = parseInt($('#btcTimestamp').val()) || 0;
+      var bitsVal   = parseInt($('#btcBits').val().trim(), 16) || 0x1d00ffff;
+      var nonce     = parseInt($('#btcNonce').val())     || 0;
+
+      return uint32LE(version)   +
+             reverseHex(prevHash) +
+             reverseHex(merkle)   +
+             uint32LE(timestamp)  +
+             uint32LE(bitsVal)    +
+             uint32LE(nonce);
+    }
+
+    // ── SHA-256 of raw bytes given as hex string ─────────────────────────────
+    function sha256OfHex(hexStr) {
+      var wa = CryptoJS.enc.Hex.parse(hexStr);
+      return CryptoJS.SHA256(wa).toString();
+    }
+
+    // ── Double SHA-256 → byte-reversed (Bitcoin display order) ───────────────
+    function bitcoinHash(headerHex) {
+      var h1 = sha256OfHex(headerHex);
+      var h2 = sha256OfHex(h1);
+      return reverseHex(h2);
+    }
+
+    // ── Decode compact Bits field to 64-char hex target ──────────────────────
+    function decodeTarget(bitsHex) {
+      var bits  = parseInt(bitsHex, 16) || 0x1d00ffff;
+      var exp   = (bits >> 24) & 0xff;
+      var mant  = bits & 0x7fffff;
+      var t     = new Array(65).join('0');
+      var ms    = ('000000' + mant.toString(16)).slice(-6);
+      var pos   = (32 - exp) * 2;
+      if (pos >= 0 && pos + 6 <= 64) {
+        t = t.slice(0, pos) + ms + t.slice(pos + 6);
+      }
+      return t;
+    }
+
+    // ── Compare two 64-char hex strings: returns true if a ≤ b ──────────────
+    function hexLE(a, b) {
+      return a.toLowerCase() <= b.toLowerCase();
+    }
+
+    // ── Color-coded hex dump ─────────────────────────────────────────────────
+    var HEX_FIELDS = [
+      { cls: 'btc-hf-version',   chars: 8,  label: 'Version'   },
+      { cls: 'btc-hf-prevhash',  chars: 64, label: 'Prev Hash' },
+      { cls: 'btc-hf-merkle',    chars: 64, label: 'Merkle'    },
+      { cls: 'btc-hf-timestamp', chars: 8,  label: 'Timestamp' },
+      { cls: 'btc-hf-bits',      chars: 8,  label: 'Bits'      },
+      { cls: 'btc-hf-nonce',     chars: 8,  label: 'Nonce'     }
+    ];
+
+    function renderHexDump(hex) {
+      var html = '<div class="btc-hex-bytes">';
+      var pos  = 0;
+      HEX_FIELDS.forEach(function(f) {
+        var chunk = hex.substr(pos, f.chars);
+        var bytes = (chunk.match(/.{1,2}/g) || []).join(' ');
+        html += '<span class="btc-hf ' + f.cls + '" title="' + f.label + '">' + bytes + '</span> ';
+        pos += f.chars;
+      });
+      html += '</div>';
+      return html;
+    }
+
+    // ── Main update ──────────────────────────────────────────────────────────
+    function updateAll() {
+      var headerHex = packHeaderHex();
+      var h1        = sha256OfHex(headerHex);
+      var h2        = sha256OfHex(h1);
+      var blockHash = reverseHex(h2);
+      var bitsHex   = ($('#btcBits').val().trim() || '1d00ffff').toLowerCase();
+      var target    = decodeTarget(bitsHex);
+      var valid     = hexLE(blockHash, target);
+
+      // Timestamp human date
+      var ts = parseInt($('#btcTimestamp').val());
+      $('#btcTimestampDisplay').text(ts ? new Date(ts * 1000).toUTCString() : '—');
+
+      // Result bar
+      $('#btcBlockHash').text(blockHash);
+      $('#btcValidBadge')
+        .attr('class', 'btc-result-badge ' + (valid ? 'btc-badge-valid' : 'btc-badge-invalid'))
+        .text(valid ? '✓ VALID' : '✗ INVALID');
+
+      // Hex dump
+      $('#btcHexDump').html(renderHexDump(headerHex));
+
+      // SHA256d pipeline
+      var headerLines = (headerHex.match(/.{1,32}/g) || []).join('<br>');
+      $('#btcStep0').html(headerLines);
+      $('#btcStep1').text(h1);
+      $('#btcStep2').text(h2);
+      $('#btcStep3').text(blockHash);
+
+      // Proof of Work section
+      $('#btcTargetHex').text(target);
+      $('#btcHashHex2').text(blockHash);
+      if (valid) {
+        $('#btcPowResult')
+          .attr('class', 'btc-pow-result btc-pow-valid')
+          .html('<span class="btc-pow-icon">✓</span><span class="btc-pow-text"> Hash ≤ Target — block is <strong>ACCEPTED</strong> by the network</span>');
+      } else {
+        $('#btcPowResult')
+          .attr('class', 'btc-pow-result btc-pow-invalid')
+          .html('<span class="btc-pow-icon">✗</span><span class="btc-pow-text"> Hash &gt; Target — block would be <strong>REJECTED</strong> by the network</span>');
+      }
+    }
+
+    // ── Reset to genesis ─────────────────────────────────────────────────────
+    function resetGenesis() {
+      $('#btcVersion').val(GENESIS.version);
+      $('#btcPrevHash').val(GENESIS.prevHash);
+      $('#btcMerkle').val(GENESIS.merkle);
+      $('#btcTimestamp').val(GENESIS.timestamp);
+      $('#btcBits').val(GENESIS.bits);
+      $('#btcNonce').val(GENESIS.nonce);
+      $('#btcMineStats').hide();
+      miningActive = false;
+      $('#btcMineBtn').text('⛏ Mine (vary nonce)').prop('disabled', false);
+      updateAll();
+    }
+
+    // ── Mining ───────────────────────────────────────────────────────────────
+    var miningActive   = false;
+    var miningNonce    = 0;
+    var miningAttempts = 0;
+    var miningStart    = 0;
+    var MINE_CHUNK     = 500;
+
+    function mineTick() {
+      if (!miningActive) return;
+      var bitsHex = ($('#btcBits').val().trim() || '1d00ffff').toLowerCase();
+      var target  = decodeTarget(bitsHex);
+      var end     = Math.min(miningNonce + MINE_CHUNK, 4294967295);
+
+      for (var n = miningNonce; n <= end; n++) {
+        $('#btcNonce').val(n);
+        var blockHash = bitcoinHash(packHeaderHex());
+        miningAttempts++;
+
+        if (hexLE(blockHash, target)) {
+          miningActive = false;
+          updateAll();
+          var elapsed = ((Date.now() - miningStart) / 1000).toFixed(2);
+          var hps = Math.round(miningAttempts / (parseFloat(elapsed) || 1));
+          $('#btcMineStats').show().html(
+            '<span class="btc-mine-stat">Attempts: <strong>' + miningAttempts.toLocaleString() + '</strong></span>' +
+            '<span class="btc-mine-stat">H/s: <strong>' + hps.toLocaleString() + '</strong></span>' +
+            '<span class="btc-mine-stat">Time: <strong>' + elapsed + 's</strong></span>' +
+            '<span class="btc-mine-found">✓ Nonce <strong>' + n.toLocaleString() + '</strong> found — hash: ' + blockHash + '</span>'
+          );
+          $('#btcMineBtn').text('⛏ Mine (vary nonce)').prop('disabled', false);
+          return;
+        }
+      }
+
+      miningNonce = end + 1;
+      if (miningNonce > 4294967295) {
+        miningActive = false;
+        $('#btcMineStats').show().html(
+          '<span class="btc-mine-stat">✗ All 4B nonces exhausted (' + miningAttempts.toLocaleString() + ' attempts) — no solution at this difficulty</span>'
+        );
+        $('#btcMineBtn').text('⛏ Mine (vary nonce)').prop('disabled', false);
+        return;
+      }
+
+      var elapsed = (Date.now() - miningStart) / 1000;
+      var hps = elapsed > 0 ? Math.round(miningAttempts / elapsed) : 0;
+      $('#btcMineStats').show().html(
+        '<span class="btc-mine-stat">Attempts: <strong>' + miningAttempts.toLocaleString() + '</strong></span>' +
+        '<span class="btc-mine-stat">H/s: <strong>' + hps.toLocaleString() + '</strong></span>' +
+        '<span class="btc-mine-stat">Time: <strong>' + elapsed.toFixed(1) + 's</strong></span>'
+      );
+      setTimeout(mineTick, 0);
+    }
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    $(function() {
+      $('#btcVersion, #btcTimestamp, #btcNonce').on('input', updateAll);
+      $('#btcPrevHash, #btcMerkle, #btcBits').on('input', updateAll);
+
+      $('#btcMineBtn').click(function() {
+        if (miningActive) {
+          miningActive = false;
+          $(this).text('⛏ Mine (vary nonce)').prop('disabled', false);
+          return;
+        }
+        miningActive   = true;
+        miningNonce    = 0;
+        miningAttempts = 0;
+        miningStart    = Date.now();
+        $(this).text('■ Stop Mining');
+        $('#btcMineStats').show().html('<span class="btc-mine-stat">Starting…</span>');
+        setTimeout(mineTick, 100);
+      });
+
+      $('#btcResetBtn').click(resetGenesis);
+      updateAll();
+    });

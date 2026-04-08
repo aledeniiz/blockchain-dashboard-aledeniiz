@@ -1665,3 +1665,1517 @@ input {
 .row-horizon .mine-stat-nonce {
   font-size: 10px;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   HOME PAGE — Bitcoin Block card
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.home-card-bitcoin {
+  border-color: #f7931a;
+}
+
+.home-card-bitcoin:hover,
+.home-card-bitcoin:focus {
+  border-color: #d97c0e;
+  box-shadow: 0 6px 24px rgba(247,147,26,0.20);
+}
+
+.home-card-icon-bitcoin {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #f7931a, #d97c0e);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  font-size: 26px;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   BITCOIN BLOCK PAGE
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Hero ───────────────────────────────────────────────────────────────────── */
+
+.btc-hero {
+  background: linear-gradient(135deg, #2d1b00 0%, #4a2e00 40%, #1a1a1a 100%);
+  color: #fff;
+  padding: 60px 0 40px;
+  margin: 50px -15px 32px;
+  text-align: center;
+  border-radius: 0 0 8px 8px;
+}
+
+.btc-hero-badge {
+  display: inline-block;
+  background: rgba(247,147,26,0.20);
+  border: 1px solid rgba(247,147,26,0.50);
+  color: #f7931a;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 16px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+}
+
+.btc-hero-title {
+  font-size: 42px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 14px;
+}
+
+.btc-hero-subtitle {
+  font-size: 16px;
+  color: rgba(255,255,255,0.75);
+  max-width: 680px;
+  margin: 0 auto 28px;
+  line-height: 1.6;
+}
+
+.btc-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.btc-stat {
+  padding: 10px 24px;
+  border-right: 1px solid rgba(255,255,255,0.15);
+  text-align: center;
+}
+
+.btc-stat:last-child {
+  border-right: none;
+}
+
+.btc-stat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.50);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.btc-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f7931a;
+}
+
+/* ── Cards ──────────────────────────────────────────────────────────────────── */
+
+.btc-card {
+  background: #fff;
+  border: 1px solid #e8ddd0;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.btc-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #fef3e7;
+}
+
+.btc-card-icon {
+  font-size: 28px;
+  line-height: 1;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.btc-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2d1b00;
+  margin: 0 0 4px;
+}
+
+.btc-card-subtitle {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
+/* ── Fields grid ────────────────────────────────────────────────────────────── */
+
+.btc-fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.btc-field-wide {
+  grid-column: 1 / -1;
+}
+
+.btc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btc-field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a2e00;
+  margin-bottom: 0;
+}
+
+.btc-field-num {
+  font-size: 11px;
+  font-weight: 400;
+  color: #f7931a;
+  margin-right: 4px;
+}
+
+.btc-input {
+  width: 100%;
+  border: 1px solid #d0b898;
+  border-radius: 4px;
+  padding: 7px 10px;
+  font-family: monospace;
+  font-size: 13px;
+  color: #2d1b00;
+  background: #fffaf4;
+  transition: border-color 0.15s;
+}
+
+.btc-input:focus {
+  outline: none;
+  border-color: #f7931a;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(247,147,26,0.15);
+}
+
+.btc-field-hint {
+  font-size: 11px;
+  color: #999;
+  line-height: 1.4;
+}
+
+.btc-timestamp-display {
+  font-style: italic;
+  color: #f7931a !important;
+}
+
+/* ── Result bar ─────────────────────────────────────────────────────────────── */
+
+.btc-result-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #1a1a1a;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.btc-result-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  white-space: nowrap;
+}
+
+.btc-result-hash {
+  flex: 1 1 auto;
+  font-family: monospace;
+  font-size: 13px;
+  color: #f7931a;
+  word-break: break-all;
+}
+
+.btc-result-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.btc-badge-valid {
+  background: #1b4a1b;
+  color: #a5d6a7;
+  border: 1px solid #2e7d32;
+}
+
+.btc-badge-invalid {
+  background: #4a1b1b;
+  color: #ef9a9a;
+  border: 1px solid #c62828;
+}
+
+/* ── Hex dump ───────────────────────────────────────────────────────────────── */
+
+.btc-hex-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-bottom: 14px;
+  font-size: 12px;
+}
+
+.btc-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btc-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.btc-swatch-version   { background: #3a7bd5; }
+.btc-swatch-prevhash  { background: #e67e22; }
+.btc-swatch-merkle    { background: #27ae60; }
+.btc-swatch-timestamp { background: #8e44ad; }
+.btc-swatch-bits      { background: #c0392b; }
+.btc-swatch-nonce     { background: #16a085; }
+
+.btc-hex-dump {
+  background: #1a1a1a;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-x: auto;
+  word-break: break-all;
+}
+
+.btc-hex-bytes {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Field colors inside hex dump */
+.btc-hf                { padding: 1px 0; border-radius: 2px; }
+.btc-hf-version        { color: #74b0ff; }
+.btc-hf-prevhash       { color: #f39c12; }
+.btc-hf-merkle         { color: #2ecc71; }
+.btc-hf-timestamp      { color: #c39bd3; }
+.btc-hf-bits           { color: #e74c3c; }
+.btc-hf-nonce          { color: #1abc9c; }
+
+/* ── SHA256d pipeline ───────────────────────────────────────────────────────── */
+
+.btc-pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.btc-pipe-step {
+  background: #f8f4ef;
+  border: 1px solid #e8ddd0;
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.btc-pipe-final {
+  background: #1a1a1a;
+  border-color: #f7931a;
+}
+
+.btc-pipe-final .btc-pipe-tag {
+  color: #f7931a;
+}
+
+.btc-pipe-final .btc-pipe-value {
+  color: #f7931a;
+}
+
+.btc-pipe-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.btc-pipe-value {
+  font-family: monospace;
+  font-size: 12px;
+  color: #2d1b00;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+.btc-pipe-arrow {
+  text-align: center;
+  color: #f7931a;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 0;
+}
+
+/* ── Proof of Work ──────────────────────────────────────────────────────────── */
+
+.btc-pow-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.btc-pow-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.btc-pow-value {
+  background: #f8f4ef;
+  border: 1px solid #e8ddd0;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: monospace;
+  font-size: 11px;
+  word-break: break-all;
+  color: #2d1b00;
+  line-height: 1.5;
+}
+
+.btc-pow-target {
+  color: #e67e22;
+}
+
+.btc-pow-hash {
+  color: #2d1b00;
+}
+
+.btc-pow-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btc-pow-valid {
+  background: #1b4a1b;
+  color: #a5d6a7;
+}
+
+.btc-pow-invalid {
+  background: #4a1b1b;
+  color: #ef9a9a;
+}
+
+.btc-pow-icon {
+  font-size: 18px;
+}
+
+/* ── Mining Demo ────────────────────────────────────────────────────────────── */
+
+.btc-mining-desc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.btc-mine-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.btc-mine-btn {
+  font-weight: 600;
+}
+
+.btc-reset-btn {
+  font-weight: 600;
+}
+
+.btc-mine-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  background: #1a1a1a;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #c8d8ff;
+}
+
+.btc-mine-stat {
+  white-space: nowrap;
+  color: #a8c0e8;
+}
+
+.btc-mine-stat strong {
+  color: #f7931a;
+}
+
+.btc-mine-found {
+  flex: 1 1 100%;
+  color: #a5d6a7;
+  margin-top: 4px;
+  word-break: break-all;
+}
+
+.btc-mine-found strong {
+  color: #69f0ae;
+}
+
+/* ── Coinbase TX ────────────────────────────────────────────────────────────── */
+
+.btc-coinbase-box {
+  background: linear-gradient(135deg, #2d1b00, #1a1a1a);
+  border: 1px solid #f7931a;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.btc-coinbase-quote-text {
+  font-size: 18px;
+  font-style: italic;
+  color: #f7c56e;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.btc-coinbase-source {
+  font-size: 12px;
+  color: rgba(255,255,255,0.50);
+}
+
+.btc-tx-row {
+  margin-bottom: 10px;
+}
+
+.btc-tx-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.btc-tx-val {
+  font-size: 13px;
+  color: #2d1b00;
+  word-break: break-all;
+}
+
+.btc-small {
+  font-size: 11px !important;
+}
+
+.btc-mono {
+  font-family: monospace !important;
+}
+
+.btc-note {
+  background: #fff8f0;
+  border-left: 3px solid #f7931a;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #555;
+  border-radius: 0 4px 4px 0;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .btc-hero-title     { font-size: 28px; }
+  .btc-hero-subtitle  { font-size: 14px; }
+  .btc-fields-grid    { grid-template-columns: 1fr; }
+  .btc-field-wide     { grid-column: auto; }
+  .btc-pow-row        { grid-template-columns: 1fr; }
+  .btc-stats-row      { gap: 0; }
+  .btc-stat           { padding: 8px 16px; }
+  .btc-stat-value     { font-size: 15px; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   HOME — 51% Attack card
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.home-card-attack {
+  border-color: #c0392b;
+}
+
+.home-card-attack:hover,
+.home-card-attack:focus {
+  border-color: #96281b;
+  box-shadow: 0 6px 24px rgba(192,57,43,0.18);
+}
+
+.home-card-icon-attack {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #c0392b, #96281b);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  font-size: 24px;
+  color: #fff;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   51% ATTACK SIMULATOR PAGE
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Hero ───────────────────────────────────────────────────────────────────── */
+
+.atk-hero {
+  background: linear-gradient(135deg, #2d0000 0%, #4a0000 40%, #1a1a1a 100%);
+  color: #fff;
+  padding: 56px 0 36px;
+  margin: 50px -15px 28px;
+  text-align: center;
+  border-radius: 0 0 8px 8px;
+}
+
+.atk-hero-badge {
+  display: inline-block;
+  background: rgba(192,57,43,0.25);
+  border: 1px solid rgba(192,57,43,0.60);
+  color: #e74c3c;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 16px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+}
+
+.atk-hero-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 14px;
+}
+
+.atk-hero-subtitle {
+  font-size: 15px;
+  color: rgba(255,255,255,0.72);
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Shared card ─────────────────────────────────────────────────────────────── */
+
+.atk-card {
+  background: #fff;
+  border: 1px solid #e0d0d0;
+  border-radius: 8px;
+  padding: 22px 24px;
+  margin-bottom: 22px;
+}
+
+.atk-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid #fce8e8;
+}
+
+.atk-card-icon {
+  font-size: 26px;
+  line-height: 1;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.atk-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2d0000;
+  margin: 0 0 3px;
+}
+
+.atk-card-subtitle {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+}
+
+/* ── Scenario grid ───────────────────────────────────────────────────────────── */
+
+.atk-scenario-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.atk-scenario-step {
+  background: #f0f8f0;
+  border: 1px solid #c8e6c9;
+  border-radius: 6px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.atk-step-evil {
+  background: #fdf0f0;
+  border-color: #ef9a9a;
+}
+
+.atk-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+.atk-step-evil .atk-step-num {
+  background: #c62828;
+}
+
+.atk-step-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1b5e20;
+}
+
+.atk-step-evil .atk-step-title {
+  color: #b71c1c;
+}
+
+.atk-step-body {
+  font-size: 12px;
+  color: #444;
+  line-height: 1.5;
+}
+
+/* ── Two-chain layout ────────────────────────────────────────────────────────── */
+
+.atk-chains-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 200px 1fr;
+  gap: 16px;
+  margin-bottom: 22px;
+  align-items: start;
+}
+
+.atk-chain-panel {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  border: 2px solid;
+}
+
+.atk-chain-honest {
+  border-color: #1976d2;
+  background: #f5f9ff;
+}
+
+.atk-chain-attacker {
+  border-color: #c62828;
+  background: #fff5f5;
+}
+
+.atk-chain-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  color: #333;
+}
+
+.atk-chain-icon {
+  font-size: 20px;
+}
+
+.atk-chain-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.atk-badge-honest {
+  background: #1976d2;
+  color: #fff;
+}
+
+.atk-badge-attacker {
+  background: #c62828;
+  color: #fff;
+}
+
+/* ── Block cards inside chains ───────────────────────────────────────────────── */
+
+.atk-block {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 11px;
+}
+
+.atk-block-honest {
+  border-left: 3px solid #1976d2;
+}
+
+.atk-block-attacker {
+  border-left: 3px solid #c62828;
+}
+
+.atk-block-doublespend {
+  background: #fff3cd;
+  border-left: 3px solid #e65100;
+  border-color: #e65100;
+}
+
+.atk-block-pending {
+  background: #f5f5f5;
+  border-style: dashed;
+  opacity: 0.7;
+}
+
+.atk-block-reversed {
+  background: #ffebee;
+  border-color: #ef9a9a;
+  opacity: 0.65;
+  text-decoration: line-through;
+}
+
+.atk-block-winner {
+  background: #e8f5e9;
+  border-left-color: #2e7d32;
+  box-shadow: 0 2px 6px rgba(46,125,50,0.20);
+}
+
+.atk-block-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.atk-block-num {
+  font-size: 10px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.atk-block-tag {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.atk-tag-fork {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.atk-tag-fraud {
+  background: #fce4ec;
+  color: #ad1457;
+}
+
+.atk-block-valid {
+  margin-left: auto;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.atk-valid-ok  { color: #2e7d32; }
+.atk-valid-err { color: #c62828; }
+
+.atk-block-data {
+  font-size: 11px;
+  color: #333;
+  margin-bottom: 5px;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.atk-block-nonce {
+  font-size: 10px;
+  color: #888;
+  font-family: monospace;
+}
+
+.atk-block-hash {
+  font-size: 10px;
+  color: #1976d2;
+  font-family: monospace;
+  word-break: break-all;
+  margin-top: 2px;
+}
+
+.atk-block-attacker .atk-block-hash {
+  color: #c62828;
+}
+
+.atk-block-pending-label {
+  font-size: 10px;
+  color: #aaa;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.atk-block-arrow {
+  text-align: center;
+  color: #aaa;
+  font-size: 14px;
+  line-height: 1;
+  padding: 3px 0;
+}
+
+.atk-loading {
+  font-size: 12px;
+  color: #aaa;
+  font-style: italic;
+  padding: 12px 0;
+  text-align: center;
+}
+
+/* ── VS divider ──────────────────────────────────────────────────────────────── */
+
+.atk-vs-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-top: 40px;
+}
+
+.atk-vs-label {
+  font-size: 22px;
+  font-weight: 900;
+  color: #aaa;
+  letter-spacing: 2px;
+}
+
+.atk-progress-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.atk-prog-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.atk-prog-label {
+  width: 55px;
+  text-align: right;
+  color: #888;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.atk-prog-bar {
+  flex: 1;
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.atk-prog-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.atk-prog-honest   { background: #1976d2; }
+.atk-prog-attacker { background: #c62828; }
+
+.atk-prog-num {
+  width: 18px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ── Status badge ────────────────────────────────────────────────────────────── */
+
+.atk-status-badge {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 4px;
+  text-align: center;
+  justify-content: center;
+}
+
+.atk-status-behind {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+.atk-status-tie {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #1976d2;
+}
+
+.atk-status-win {
+  background: #b71c1c;
+  color: #fff;
+  border: 1px solid #7f0000;
+  animation: atk-pulse 1s ease-in-out 3;
+}
+
+@keyframes atk-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.03); }
+}
+
+.atk-status-icon {
+  font-size: 16px;
+}
+
+/* ── Control panel ───────────────────────────────────────────────────────────── */
+
+.atk-mine-desc {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.atk-mine-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.atk-btn-mine { font-weight: 600; }
+.atk-btn-auto { font-weight: 600; }
+
+.atk-mine-live {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  background: #1a1a1a;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #c8d8ff;
+  margin-top: 4px;
+}
+
+.atk-live-stat {
+  color: #a8c0e8;
+  white-space: nowrap;
+}
+
+.atk-live-stat strong {
+  color: #ff8a80;
+}
+
+/* ── Result banner ───────────────────────────────────────────────────────────── */
+
+.atk-result {
+  margin-bottom: 22px;
+}
+
+.atk-result-inner {
+  background: linear-gradient(135deg, #7f0000, #b71c1c);
+  border-radius: 8px;
+  padding: 22px 26px;
+  color: #fff;
+}
+
+.atk-result-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 18px;
+  letter-spacing: 0.5px;
+}
+
+.atk-result-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.atk-result-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.90);
+}
+
+.atk-res-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.atk-res-fail { color: #ff8a80; }
+.atk-res-ok   { color: #a5d6a7; }
+.atk-res-info { color: #90caf9; }
+
+/* ── Defense grid ────────────────────────────────────────────────────────────── */
+
+.atk-defense-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.atk-defense-item {
+  background: #f8f4ef;
+  border: 1px solid #e0d0c0;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.atk-defense-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.atk-defense-item h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2d1b00;
+  margin: 0 0 6px;
+}
+
+.atk-defense-item p {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 991px) {
+  .atk-chains-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .atk-vs-divider {
+    padding-top: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .atk-vs-label { display: none; }
+  .atk-progress-wrap { flex-direction: row; gap: 20px; width: auto; }
+}
+
+@media (max-width: 767px) {
+  .atk-hero-title     { font-size: 24px; }
+  .atk-scenario-grid  { grid-template-columns: 1fr; }
+  .atk-defense-grid   { grid-template-columns: 1fr; }
+  .atk-mine-controls  { flex-direction: column; }
+}
+
+/* ── Hash-power selector ─────────────────────────────────────────────────────── */
+
+.atk-power-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.atk-power-btn {
+  flex: 1 1 0;
+  min-width: 90px;
+  background: #f8f4ef;
+  border: 2px solid #d0b898;
+  border-radius: 8px;
+  padding: 12px 8px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+
+.atk-power-btn:hover {
+  border-color: #c62828;
+  background: #fff5f5;
+}
+
+.atk-power-selected {
+  border-color: #c62828 !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(198,40,40,0.18);
+}
+
+.atk-power-pct {
+  font-size: 22px;
+  font-weight: 800;
+  color: #c62828;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.atk-power-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #444;
+  margin-bottom: 3px;
+}
+
+.atk-power-hint {
+  font-size: 10px;
+  color: #999;
+  line-height: 1.3;
+}
+
+.atk-power-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #1565c0;
+  line-height: 1.5;
+}
+
+.atk-power-info-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── New status and result states ─────────────────────────────────────────────── */
+
+.atk-status-fail {
+  background: #1b5e20;
+  color: #a5d6a7;
+  border: 1px solid #2e7d32;
+}
+
+.atk-result-bad  { background: linear-gradient(135deg, #7f0000, #b71c1c); }
+.atk-result-good { background: linear-gradient(135deg, #1b4a1b, #2e7d32); }
+
+.atk-block-failed {
+  opacity: 0.5;
+  border-style: dashed;
+  text-decoration: line-through;
+}
+
+.atk-block-winner {
+  background: #e8f5e9;
+  border-left-color: #2e7d32;
+  box-shadow: 0 2px 6px rgba(46,125,50,0.20);
+}
+
+/* live honest counter */
+.atk-live-honest { color: #90caf9; }
+.atk-live-honest strong { color: #64b5f6; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   HOME — Mempool card
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.home-card-mempool { border-color: #1565c0; }
+.home-card-mempool:hover, .home-card-mempool:focus {
+  border-color: #0d47a1;
+  box-shadow: 0 6px 24px rgba(21,101,192,0.18);
+}
+.home-card-icon-mempool {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px; font-size: 26px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   MEMPOOL & FEES PAGE
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Hero ───────────────────────────────────────────────────────────────────── */
+
+.mp-hero {
+  background: linear-gradient(135deg, #001529 0%, #002a52 50%, #1a1a1a 100%);
+  color: #fff;
+  padding: 56px 0 36px;
+  margin: 50px -15px 28px;
+  text-align: center;
+  border-radius: 0 0 8px 8px;
+}
+.mp-hero-badge {
+  display: inline-block;
+  background: rgba(21,101,192,0.25);
+  border: 1px solid rgba(21,101,192,0.60);
+  color: #90caf9;
+  font-size: 12px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; padding: 4px 16px; border-radius: 20px;
+  margin-bottom: 18px;
+}
+.mp-hero-title {
+  font-size: 38px; font-weight: 700; color: #fff; margin: 0 0 14px;
+}
+.mp-hero-subtitle {
+  font-size: 15px; color: rgba(255,255,255,0.75);
+  max-width: 640px; margin: 0 auto; line-height: 1.6;
+}
+
+/* ── Shared card ────────────────────────────────────────────────────────────── */
+
+.mp-card {
+  background: #fff;
+  border: 1px solid #cde;
+  border-radius: 8px;
+  padding: 22px 24px;
+  margin-bottom: 22px;
+}
+.mp-card-header {
+  display: flex; align-items: flex-start; gap: 14px;
+  margin-bottom: 18px; padding-bottom: 14px;
+  border-bottom: 2px solid #e3f2fd;
+}
+.mp-card-icon { font-size: 26px; flex-shrink: 0; margin-top: 2px; }
+.mp-card-title  { font-size: 18px; font-weight: 700; color: #0d1b2e; margin: 0 0 3px; }
+.mp-card-subtitle { font-size: 12px; color: #999; margin: 0; }
+
+/* ── Concept steps ──────────────────────────────────────────────────────────── */
+
+.mp-concept-steps {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+}
+.mp-concept-step {
+  background: #f0f6ff; border: 1px solid #bbdefb;
+  border-radius: 6px; padding: 14px;
+}
+.mp-concept-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #1565c0; color: #fff;
+  font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
+}
+.mp-concept-title { font-size: 13px; font-weight: 700; color: #0d47a1; margin-bottom: 5px; }
+.mp-concept-body  { font-size: 12px; color: #444; line-height: 1.5; }
+
+/* ── Main sim layout ────────────────────────────────────────────────────────── */
+
+.mp-sim-layout {
+  display: grid;
+  grid-template-columns: 1fr 180px 1fr;
+  gap: 16px;
+  margin-bottom: 22px;
+  align-items: start;
+}
+
+.mp-panel {
+  background: #fff;
+  border: 2px solid #1565c0;
+  border-radius: 8px;
+  padding: 14px;
+  min-height: 300px;
+}
+.mp-panel-block { border-color: #2e7d32; }
+
+.mp-panel-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px; padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+  flex-wrap: wrap; gap: 6px;
+}
+.mp-panel-title {
+  font-size: 14px; font-weight: 700; color: #333; margin: 0;
+  display: flex; align-items: center; gap: 6px;
+}
+.mp-panel-controls { display: flex; gap: 6px; margin-left: auto; }
+.mp-counter { font-size: 12px; font-weight: 400; color: #888; }
+
+.mp-fee-filter {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: #555; margin-bottom: 10px;
+}
+.mp-fee-filter input { flex: 1; }
+
+/* ── Tx cards ────────────────────────────────────────────────────────────────── */
+
+.mp-tx-list {
+  max-height: 420px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.mp-tx {
+  background: #f8faff; border: 1px solid #bbdefb;
+  border-left: 3px solid #1565c0;
+  border-radius: 4px; padding: 7px 10px;
+  font-size: 11px; cursor: default;
+}
+.mp-tx-confirmed {
+  background: #f1f8e9; border-color: #c8e6c9;
+  border-left-color: #2e7d32;
+}
+.mp-tx-top {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 4px;
+}
+.mp-tx-id {
+  font-family: monospace; font-size: 10px; color: #888; flex: 1;
+}
+.mp-tx-fee-badge {
+  font-size: 9px; font-weight: 700; color: #fff;
+  padding: 2px 6px; border-radius: 8px; white-space: nowrap;
+}
+.mp-tx-body {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+}
+.mp-tx-parties { font-weight: 600; color: #333; }
+.mp-tx-value   { color: #1565c0; font-weight: 700; font-family: monospace; }
+.mp-tx-meta    { font-size: 10px; color: #aaa; }
+.mp-empty-hint { font-size: 12px; color: #bbb; font-style: italic; padding: 20px 0; text-align: center; }
+
+/* ── Actions middle column ──────────────────────────────────────────────────── */
+
+.mp-actions {
+  display: flex; flex-direction: column; gap: 14px;
+  padding-top: 44px;
+}
+.mp-block-info {
+  background: #f0f6ff; border: 1px solid #bbdefb;
+  border-radius: 6px; padding: 12px;
+}
+.mp-block-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+.mp-block-val   { font-size: 12px; font-weight: 700; color: #0d47a1; margin-bottom: 8px; }
+.mp-block-val:last-child { margin-bottom: 0; }
+
+.mp-sort-group { text-align: center; }
+.mp-sort-label { font-size: 11px; color: #888; margin-bottom: 6px; }
+
+.mp-mine-btn { width: 100%; font-size: 13px; font-weight: 600; padding: 10px 8px; }
+.mp-mine-btn small { font-size: 10px; font-weight: 400; }
+
+.mp-mine-result { margin-top: 6px; }
+.mp-mine-banner {
+  background: #1b5e20; border-radius: 6px; padding: 12px;
+  font-size: 12px; color: #c8e6c9;
+}
+.mp-mine-banner-title { font-size: 14px; font-weight: 700; color: #a5d6a7; margin-bottom: 8px; }
+.mp-mine-banner-row {
+  display: flex; justify-content: space-between; padding: 2px 0;
+}
+.mp-mine-banner-row strong { color: #69f0ae; }
+.mp-mine-total {
+  border-top: 1px solid rgba(255,255,255,0.2);
+  margin-top: 4px; padding-top: 6px; font-weight: 700;
+}
+
+/* ── Fee chart ──────────────────────────────────────────────────────────────── */
+
+.mp-chart-wrap {
+  background: #fafafa; border: 1px solid #e0e0e0;
+  border-radius: 6px; padding: 12px; overflow-x: auto;
+}
+.mp-chart-wrap canvas { display: block; max-width: 100%; }
+
+/* ── RBF ────────────────────────────────────────────────────────────────────── */
+
+.mp-rbf-desc { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 16px; }
+.mp-rbf-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.mp-rbf-col  { display: flex; flex-direction: column; gap: 8px; }
+.mp-rbf-label { font-size: 12px; font-weight: 600; color: #444; }
+.mp-rbf-ok {
+  background: #e8f5e9; border: 1px solid #a5d6a7;
+  border-radius: 6px; padding: 10px 14px;
+  font-size: 12px; color: #1b5e20; line-height: 1.5;
+}
+.mp-rbf-ok strong { color: #1b5e20; }
+
+/* ── Key facts ──────────────────────────────────────────────────────────────── */
+
+.mp-facts-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+}
+.mp-fact {
+  background: #f8f4ef; border: 1px solid #e0d0c0;
+  border-radius: 6px; padding: 14px;
+}
+.mp-fact-icon { font-size: 22px; margin-bottom: 8px; }
+.mp-fact h4   { font-size: 13px; font-weight: 700; color: #2d1b00; margin: 0 0 6px; }
+.mp-fact p    { font-size: 12px; color: #555; margin: 0; line-height: 1.5; }
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 991px) {
+  .mp-sim-layout       { grid-template-columns: 1fr; }
+  .mp-actions          { padding-top: 0; flex-direction: row; flex-wrap: wrap; }
+  .mp-mine-btn         { flex: 1 1 160px; }
+  .mp-concept-steps    { grid-template-columns: 1fr 1fr; }
+  .mp-facts-grid       { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 767px) {
+  .mp-hero-title       { font-size: 26px; }
+  .mp-concept-steps    { grid-template-columns: 1fr; }
+  .mp-facts-grid       { grid-template-columns: 1fr; }
+  .mp-rbf-row          { grid-template-columns: 1fr; }
+}
