@@ -23,6 +23,10 @@ html
     script(src='/javascripts/lib/ladda.min.js')
     script(src='/javascripts/lib/ie10-viewport-bug-workaround.js')
     script(src='/javascripts/lib/sha256.js')
+    script(src='/javascripts/lib/BigInteger.min.js')
+    script(src='/javascripts/lib/Buffer.js')
+    script(src='/javascripts/lib/elliptic.js')
+    script(src='/javascripts/lib/js.cookie.min.js')
     script(src='/javascripts/blockchain.js')
 
   body
@@ -51,6 +55,18 @@ html
               a(href='/coinbase') #{__('Coinbase')}
             li(class={active: page === 'theory'})
               a(href='/theory') #{__('Theory')}
+            li.dropdown(class={active: page === 'keys' || page === 'signatures' || page === 'transaction'})
+              a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                | Keys &amp; Signing
+                span.caret
+              ul.dropdown-menu.dropdown-menu-right
+                li.dropdown-header Public / Private Key Cryptography
+                li(class={active: page === 'keys'})
+                  a(href='/keys') 🔑 Key Pairs
+                li(class={active: page === 'signatures'})
+                  a(href='/signatures') ✍️ Signatures
+                li(class={active: page === 'transaction'})
+                  a(href='/transaction') 💸 Transaction
             li.dropdown
               a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
                 span#difficulty-label Difficulty: 4

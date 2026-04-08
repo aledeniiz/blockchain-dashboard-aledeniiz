@@ -70,6 +70,39 @@ block content
             | Understand the anatomy of a Bitcoin block: every header field explained,
             | how blocks chain together, Merkle trees, and Proof of Work.
 
+  .container.home-modules.home-modules-keys
+    h3.home-section-title
+      span.glyphicon.glyphicon-lock
+      |  Keys &amp; Digital Signatures
+    p.home-section-subtitle
+      | Understand the cryptographic foundation behind every blockchain transaction:
+      | key pairs, signing, and verification using the secp256k1 elliptic curve (same as Bitcoin &amp; Ethereum).
+    .row
+      .col-sm-6.col-md-4
+        a.home-card.home-card-key(href='/keys')
+          .home-card-icon.home-card-icon-key
+            span.glyphicon.glyphicon-lock
+          h3 Key Pairs
+          p
+            | Generate a public / private key pair using the secp256k1 elliptic curve.
+            | Understand how the public key is derived from the private key — and why it cannot be reversed.
+      .col-sm-6.col-md-4
+        a.home-card.home-card-key(href='/signatures')
+          .home-card-icon.home-card-icon-key
+            span.glyphicon.glyphicon-pencil
+          h3 Signatures
+          p
+            | Sign any message with your private key and verify it with the public key.
+            | Change one character in the message — the signature breaks instantly.
+      .col-sm-6.col-md-4
+        a.home-card.home-card-key(href='/transaction')
+          .home-card-icon.home-card-icon-key
+            span.glyphicon.glyphicon-transfer
+          h3 Transaction
+          p
+            | Sign a payment transaction (amount + sender + recipient).
+            | See why changing the amount or recipient after signing makes the transaction invalid.
+
   .container
     p.home-attribution
       | Original demo by&nbsp;

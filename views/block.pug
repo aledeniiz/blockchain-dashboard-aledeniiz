@@ -23,6 +23,15 @@ block content
           .col-sm-10
             textarea#block1chain1data.form-control(rows='10')
 
+        .form-group
+          label.col-sm-2.control-label.merkle-label Merkle:
+          .col-sm-10
+            input#block1chain1merkle.form-control.merkle-field(type='text', disabled, placeholder='hash of data lines...')
+
+        .form-group.merkle-tree-row
+          .col-sm-offset-2.col-sm-10
+            #block1chain1merkleTree.merkle-tree-panel
+
         #state.form-group
           label.col-sm-2.control-label(for='block1chain1hash') #{__('Hash')}:
           .col-sm-10
@@ -34,6 +43,10 @@ block content
           .col-sm-10
             button#block1chain1mineButton.btn.btn-primary.ladda-button(data-style='expand-right')
               span.ladda-label #{__('Mine')}
+
+        .form-group
+          .col-sm-offset-2.col-sm-10
+            #block1chain1mineStats.mine-stats(style='display:none')
 
   script.
     $(function() {

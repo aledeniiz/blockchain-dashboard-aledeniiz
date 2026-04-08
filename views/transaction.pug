@@ -1,0 +1,278 @@
+extends layout
+
+block content
+  .container
+    h1 Transaction
+    p.text-muted
+      | In a real blockchain, every transaction must be signed by the sender's private key.
+      | This proves ownership of the funds without revealing the secret key.
+      | The recipient and amount are part of the signed data — tampering with either invalidates the signature.
+
+    ul.nav.nav-tabs#txTabs(role='tablist')
+      li.active(role='presentation')
+        a(href='#tab-sign', role='tab', data-toggle='tab')
+          span.glyphicon.glyphicon-pencil
+          |  Sign Transaction
+      li(role='presentation')
+        a(href='#tab-verify', role='tab', data-toggle='tab')
+          span.glyphicon.glyphicon-ok-circle
+          |  Verify Transaction
+
+    .tab-content.sig-tab-content
+
+      //- ── SIGN TAB ───────────────────────────────────────────────────────────
+      #tab-sign.tab-pane.active(role='tabpanel')
+        .well#signWell
+          form.form-horizontal
+
+            .form-group
+              label.col-sm-2.control-label Amount
+              .col-sm-10
+                .input-group
+                  span.input-group-addon $
+                  input#txAmount.form-control(type='text', value='20.00', autocomplete='off')
+
+            .form-group
+              label.col-sm-2.control-label From (you)
+              .col-sm-10
+                input#txFrom.form-control(
+                  type='text',
+                  placeholder='your public key (auto-loaded from Keys page)',
+                  autocomplete='off',
+                  spellcheck='false'
+                )
+              .col-sm-10
+                small.text-muted.tx-field-hint Your public key — this is your blockchain address
+
+            .form-group
+              label.col-sm-2.control-label To
+              .col-sm-10
+                input#txTo.form-control(
+                  type='text',
+                  placeholder='recipient public key',
+                  autocomplete='off',
+                  spellcheck='false'
+                )
+              .col-sm-10
+                small.text-muted.tx-field-hint Recipient address (public key)
+
+            .form-group
+              label.col-sm-2.control-label Private Key
+              .col-sm-10
+                input#signPrivateKey.form-control(
+                  type='text',
+                  placeholder='your decimal private key — from Key Pairs page',
+                  autocomplete='off',
+                  spellcheck='false'
+                )
+
+            .form-group
+              .col-sm-offset-2.col-sm-10
+                .sig-process-hint
+                  code SHA-256(amount + from + to)
+                  |  → sign with private key
+
+            .form-group
+              .col-sm-offset-2.col-sm-10
+                button#signButton.btn.btn-primary(type='button')
+                  span.glyphicon.glyphicon-pencil
+                  |  Sign Transaction
+
+            .form-group
+              label.col-sm-2.control-label Signature
+              .col-sm-10
+                textarea#signatureOutput.form-control.sig-output(
+                  rows='3',
+                  disabled,
+                  placeholder='transaction signature will appear here…',
+                  spellcheck='false'
+                )
+
+            .form-group
+              .col-sm-offset-2.col-sm-10
+                button#copyToVerify.btn.btn-default.btn-sm(type='button', style='display:none')
+                  span.glyphicon.glyphicon-arrow-right
+                  |  Copy to Verify tab
+
+        .well.well-sm.sig-step-box
+          strong What gets signed:
+          p
+            | The signed message is the concatenation of:
+            code amount + from_address + to_address
+          p
+            | Change
+            em any
+            |  of these three fields after signing → the signature becomes invalid.
+            | This is how the blockchain prevents tampering with transactions.
+
+      //- ── VERIFY TAB ─────────────────────────────────────────────────────────
+      #tab-verify.tab-pane(role='tabpanel')
+        .well#verifyWell
+          form.form-horizontal
+
+            .form-group
+              label.col-sm-2.control-label Amount
+              .col-sm-10
+                .input-group
+                  span.input-group-addon $
+                  input#verifyAmount.form-control(type='text', value='20.00', autocomplete='off')
+
+            .form-group
+              label.col-sm-2.control-label From
+              .col-sm-10
+                input#verifyFrom.form-control(
+                  type='text',
+                  placeholder='sender public key',
+                  autocomplete='off',
+                  spellcheck='false'
+                )
+              .col-sm-10
+                small.text-muted.tx-field-hint The public key is used to verify the signature — no private key needed
+
+            .form-group
+              label.col-sm-2.control-label To
+              .col-sm-10
+                input#verifyTo.form-control(
+                  type='text',
+                  placeholder='recipient public key',
+                  autocomplete='off',
+                  spellcheck='false'
+                )
+
+            .form-group
+              label.col-sm-2.control-label Signature
+              .col-sm-10
+                textarea#verifySignature.form-control(rows='3', placeholder='hex-encoded DER signature…', spellcheck='false')
+
+            .form-group
+              .col-sm-offset-2.col-sm-10
+                button#verifyButton.btn.btn-primary(type='button')
+                  span.glyphicon.glyphicon-ok-circle
+                  |  Verify Transaction
+
+        .well.well-sm.sig-step-box
+          strong Try the classroom experiment:
+          ol
+            li Sign a transaction of $20.00 from your address to a recipient
+            li Switch to Verify — it should be green ✓
+            li Change the amount from $20.00 to $200.00 and verify again → red ✗
+            li Restore the amount to $20.00 → green again ✓
+          p.text-muted
+            | This demonstrates why signed transactions cannot be modified once broadcast to the network.
+
+  script.
+    var EC = elliptic.elliptic().ec;
+    var ec = new EC('secp256k1');
+    var keypair = ec.genKeyPair();
+
+    var defaultRecipient = '04cc955bf8e359cc7ebbb66f4c2dc616a93e8ba08e93d27996e20299ba92cba9cbd73c2ff46ed27a3727ba09486ba32b5ac35dd20c0adec020536996ca4d9f3d74';
+
+    function update() {
+      var privHex = keypair.getPrivate('hex');
+      var pubHex  = keypair.getPublic('hex');
+      $('#signPrivateKey').val(bigInt(privHex, 16).toString());
+      $('#txFrom').val(pubHex);
+      $('#verifyFrom').val(pubHex);
+      Cookies.set('privateKey', privHex);
+      Cookies.set('publicKey', pubHex);
+    }
+
+    function resetVerifyState() {
+      $('#verifyWell').removeClass('well-success well-error');
+    }
+    function resetSignState() {
+      $('#signWell').removeClass('well-success well-error');
+      $('#signatureOutput').val('');
+      $('#copyToVerify').hide();
+    }
+
+    $(function() {
+      // Restore keys from cookies if available
+      if (Cookies.get('privateKey')) {
+        keypair = ec.keyFromPrivate(Cookies.get('privateKey'));
+      }
+      // Restore transaction fields from cookies
+      if (Cookies.get('amount')) { $('#txAmount').val(Cookies.get('amount')); $('#verifyAmount').val(Cookies.get('amount')); }
+      if (Cookies.get('to'))     { $('#txTo').val(Cookies.get('to'));         $('#verifyTo').val(Cookies.get('to')); }
+      if (!$('#txTo').val())     { $('#txTo').val(defaultRecipient);          $('#verifyTo').val(defaultRecipient); }
+      update();
+
+      // Private key typed manually (decimal)
+      $('#signPrivateKey').on('input', function() {
+        $(this).val($(this).val().replace(/\D/g, ''));
+        if (!$(this).val()) return;
+        try {
+          keypair = ec.keyFromPrivate(bigInt($(this).val()).toString(16));
+          update();
+        } catch(e) {}
+        resetSignState();
+      });
+
+      // Sync amount and to between tabs + persist
+      $('#txAmount').on('input', function() {
+        $('#verifyAmount').val($(this).val());
+        Cookies.set('amount', $(this).val());
+        resetSignState();
+      });
+      $('#txTo').on('input', function() {
+        $('#verifyTo').val($(this).val());
+        Cookies.set('to', $(this).val());
+        resetSignState();
+      });
+      $('#verifyAmount').on('input', function() { $('#txAmount').val($(this).val()); resetVerifyState(); });
+      $('#verifyFrom').on('input',   resetVerifyState);
+      $('#verifyTo').on('input',     function() { $('#txTo').val($(this).val()); resetVerifyState(); });
+      $('#verifySignature').on('input', resetVerifyState);
+
+      // ── Sign ──────────────────────────────────────────────────────────────
+      $('#signButton').on('click', function() {
+        var amount = $('#txAmount').val().trim();
+        var from   = $('#txFrom').val().trim();
+        var to     = $('#txTo').val().trim();
+        if (!amount || !from || !to) { alert('Please fill in Amount, From, and To.'); return; }
+        try {
+          var message       = amount + from + to;
+          var binaryMessage = buffer.Buffer.from(CryptoJS.SHA256(message).toString(CryptoJS.enc.Hex));
+          var sigHex        = buffer.Buffer.from(keypair.sign(binaryMessage).toDER()).toString('hex');
+          $('#signatureOutput').val(sigHex);
+          // Populate verify tab
+          $('#verifyAmount').val(amount);
+          $('#verifyFrom').val(from);
+          $('#verifyTo').val(to);
+          $('#verifySignature').val(sigHex);
+          update();
+          $('#signWell').removeClass('well-error').addClass('well-success');
+          $('#copyToVerify').show();
+        } catch(e) {
+          $('#signatureOutput').val('Error: ' + e.message);
+          $('#signWell').removeClass('well-success').addClass('well-error');
+          $('#copyToVerify').hide();
+        }
+      });
+
+      // ── Copy to Verify tab ────────────────────────────────────────────────
+      $('#copyToVerify').on('click', function() {
+        $('a[href="#tab-verify"]').tab('show');
+      });
+
+      // ── Verify ────────────────────────────────────────────────────────────
+      $('#verifyButton').on('click', function() {
+        var amount = $('#verifyAmount').val().trim();
+        var from   = $('#verifyFrom').val().trim();
+        var to     = $('#verifyTo').val().trim();
+        var sigHex = $('#verifySignature').val().trim();
+        if (!amount || !from || !to || !sigHex) { alert('Please fill in all fields.'); return; }
+        try {
+          var tmpKey        = ec.keyFromPublic(from, 'hex');
+          var message       = amount + from + to;
+          var binaryMessage = buffer.Buffer.from(CryptoJS.SHA256(message).toString(CryptoJS.enc.Hex));
+          if (tmpKey.verify(binaryMessage, sigHex)) {
+            $('#verifyWell').removeClass('well-error').addClass('well-success');
+          } else {
+            $('#verifyWell').removeClass('well-success').addClass('well-error');
+          }
+        } catch(e) {
+          $('#verifyWell').removeClass('well-success').addClass('well-error');
+        }
+      });
+    });
