@@ -1,0 +1,129 @@
+extends layout
+
+block content
+  .classroom-mode-page#classroomModePage
+    .classroom-hero
+      .container.classroom-hero-grid
+        .classroom-hero-copy
+          .classroom-eyebrow Multiplayer Mode
+          h1.classroom-hero-title Shared Blockchain Lab for the Whole Class
+          p.classroom-hero-subtitle
+            | One teacher creates a room. Students join with the class code. Everyone sees the same mempool,
+            | the same confirmed blocks and the same consensus feed in real time.
+          .classroom-hero-actions
+            button.btn.btn-primary.btn-lg(type='button', onclick="document.getElementById('createRoomForm').scrollIntoView({behavior:'smooth'})") Create a Classroom
+            button.btn.btn-default.btn-lg(type='button', onclick="document.getElementById('joinRoomForm').scrollIntoView({behavior:'smooth'})") Join as Student
+        .classroom-hero-panel
+          .classroom-panel-header
+            span.classroom-panel-kicker Active Scenario
+            h2.classroom-panel-title Shared Mempool &amp; Mining
+          ul.classroom-session-list
+            li
+              strong Teacher
+              span Creates the room, resets the lab and injects traffic.
+            li
+              strong Students
+              span Broadcast transactions and compete to mine the next shared block.
+            li
+              strong Realtime
+              span Every connected browser updates from one server-authoritative state.
+            li
+              strong MVP Scope
+              span In-memory rooms for class demos without external infrastructure.
+
+    .container.classroom-body
+      .classroom-status#classroomStatus Ready to create or join a classroom.
+
+      .row#classroomJoinShell
+        .col-md-6
+          .classroom-card
+            h3 Teacher: Create Room
+            p Start a live session and share the room code with your students.
+            form#createRoomForm
+              .form-group
+                label(for='teacherName') Teacher name
+                input#teacherName.form-control(type='text', value='Professor', required, autocomplete='name')
+              .form-group
+                label(for='roomTitle') Session title
+                input#roomTitle.form-control(type='text', value='Cryptography Lab', required)
+              .form-group
+                label(for='roomDifficulty') Difficulty
+                select#roomDifficulty.form-control
+                  option(value='3') 3 zeros
+                  option(value='4' selected) 4 zeros
+                  option(value='5') 5 zeros
+              button.btn.btn-primary.btn-block(type='submit') Create Classroom Room
+        .col-md-6
+          .classroom-card
+            h3 Student: Join Room
+            p Enter the room code from your teacher and choose a display name.
+            form#joinRoomForm
+              .form-group
+                label(for='joinCode') Room code
+                input#joinCode.form-control(type='text', maxlength='6', required, autocomplete='off', spellcheck='false', placeholder='ABC123')
+              .form-group
+                label(for='studentName') Display name
+                input#studentName.form-control(type='text', required, autocomplete='nickname', placeholder='Alice')
+              button.btn.btn-default.btn-block(type='submit') Join Classroom
+
+      .classroom-app-shell#classroomAppShell(style='display:none')
+        .classroom-room-bar
+          .classroom-room-bar-main
+            span.classroom-room-pill#classroomRoleBadge Student View
+            h2#classroomRoomTitle Cryptography Lab
+            p Room code:
+              strong#classroomRoomCode ------
+            p Teacher:
+              strong#classroomTeacherName --
+          .classroom-room-bar-meta
+            .classroom-room-metric
+              span Difficulty
+              strong#classroomDifficulty 4
+            .classroom-room-metric
+              span Participants
+              strong#classroomCounts 0
+            .classroom-room-metric
+              span Mempool TX
+              strong#classroomMempoolCount 0
+            .classroom-room-metric
+              span Blocks
+              strong#classroomChainCount 0
+            button.btn.btn-default(type='button', id='leaveRoomButton') Clear Device Session
+
+        .row
+          .col-md-4
+            .classroom-card
+              h3 Participants
+              ul.classroom-people#classroomParticipants
+            .classroom-card
+              h3 Teacher Controls
+              p(data-role-only='teacher') Use these controls to steer the exercise live.
+              button.btn.btn-primary.btn-block(type='button', id='injectTrafficButton', data-role-only='teacher') Inject Network Traffic
+              button.btn.btn-default.btn-block(type='button', id='resetRoomButton', data-role-only='teacher') Reset Classroom Scenario
+              p.classroom-helper-text(data-role-only='teacher') Students cannot use these orchestration actions.
+          .col-md-4
+            .classroom-card
+              h3 Shared Mempool
+              form#txComposer.classroom-composer
+                .form-group
+                  label(for='txTo') Recipient
+                  input#txTo.form-control(type='text', placeholder='Bob')
+                .form-group
+                  label(for='txValue') Value (satoshis)
+                  input#txValue.form-control(type='number', min='1000', step='1000', value='50000')
+                .form-group
+                  label(for='txFeeRate') Fee rate (sat/vB)
+                  input#txFeeRate.form-control(type='number', min='1', step='1', value='25')
+                button.btn.btn-primary.btn-block(type='submit') Broadcast Transaction
+              button.btn.btn-default.btn-block(type='button', id='mineSharedBlock') Mine Shared Block
+              p.classroom-helper-text The first valid miner updates the same chain for everyone in the room.
+              ul.classroom-tx-list#classroomMempool
+          .col-md-4
+            .classroom-card
+              h3 Confirmed Chain
+              ul.classroom-chain-list#classroomChain
+            .classroom-card
+              h3 Consensus Feed
+              ul.classroom-feed#classroomFeed
+
+    script(src='/javascripts/classroom.js')

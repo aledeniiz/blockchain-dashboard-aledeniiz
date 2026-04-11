@@ -30,80 +30,100 @@ html
     script(src='/javascripts/blockchain.js')
 
   body
-    nav.navbar.navbar-inverse.navbar-fixed-top
-      .container
-        .navbar-header
-          button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#navbar', aria-expanded='false', aria-controls='navbar')
-            span.sr-only Toggle navigation
-            span.icon-bar
-            span.icon-bar
-            span.icon-bar
-          a.navbar-brand(href='/') #{__('Blockchain Demo')}
-        #navbar.collapse.navbar-collapse
-          ul.nav.navbar-nav.navbar-right
-            li.dropdown(class={active: page === 'hash' || page === 'block' || page === 'blockchain' || page === 'distributed' || page === 'tokens' || page === 'coinbase'})
-              a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                | Blockchain
-                span.caret
-              ul.dropdown-menu
-                li.dropdown-header Core Modules
-                li(class={active: page === 'hash'})
-                  a(href='/hash') # #{__('Hash')}
-                li(class={active: page === 'block'})
-                  a(href='/block') ☐ #{__('Block')}
-                li(class={active: page === 'blockchain'})
-                  a(href='/blockchain') ⛓ #{__('Blockchain')}
-                li(class={active: page === 'distributed'})
-                  a(href='/distributed') 🌐 #{__('Distributed')}
-                li.divider(role='separator')
-                li.dropdown-header Transactions
-                li(class={active: page === 'tokens'})
-                  a(href='/tokens') ⇄ #{__('Tokens')}
-                li(class={active: page === 'coinbase'})
-                  a(href='/coinbase') ★ #{__('Coinbase')}
-            li.dropdown(class={active: page === 'bitcoinblock' || page === 'attack51' || page === 'mempool'})
-              a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                | ₿ Bitcoin
-                span.caret
-              ul.dropdown-menu
-                li.dropdown-header Advanced
-                li(class={active: page === 'bitcoinblock'})
-                  a(href='/bitcoinblock') ₿ Real Bitcoin Block
-                li(class={active: page === 'attack51'})
-                  a(href='/attack51') ⚔ 51% Attack Simulator
-                li(class={active: page === 'mempool'})
-                  a(href='/mempool') 📨 Mempool &amp; Fees
-            li(class={active: page === 'theory'})
-              a(href='/theory') #{__('Theory')}
-            li.dropdown(class={active: page === 'keys' || page === 'signatures' || page === 'transaction'})
-              a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                | 🔑 Keys
-                span.caret
-              ul.dropdown-menu.dropdown-menu-right
-                li.dropdown-header Public / Private Key Cryptography
-                li(class={active: page === 'keys'})
-                  a(href='/keys') 🔑 Key Pairs
-                li(class={active: page === 'signatures'})
-                  a(href='/signatures') ✍️ Signatures
-                li(class={active: page === 'transaction'})
-                  a(href='/transaction') 💸 Transaction
-            li.dropdown
-              a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                span#difficulty-label Difficulty: 4
-                span.caret
-              ul.dropdown-menu.dropdown-menu-right
-                li.dropdown-header Leading zeros required
-                li.difficulty-option#difficulty-1
-                  a(href='#', onclick='setDifficulty(1); return false;') 1 zero — instant
-                li.difficulty-option#difficulty-2
-                  a(href='#', onclick='setDifficulty(2); return false;') 2 zeros — seconds
-                li.difficulty-option#difficulty-3
-                  a(href='#', onclick='setDifficulty(3); return false;') 3 zeros — ~1 minute
-                li.difficulty-option.active#difficulty-4
-                  a(href='#', onclick='setDifficulty(4); return false;') 4 zeros — ~15 min (default)
-                li.difficulty-option#difficulty-5
-                  a(href='#', onclick='setDifficulty(5); return false;') 5 zeros — ~4 hours
-                li.difficulty-option#difficulty-6
-                  a(href='#', onclick='setDifficulty(6); return false;') 6 zeros — ~3 days
+    a.skip-link(href='#main-content') Skip to content
+    .app-shell
+      nav.navbar.navbar-inverse.navbar-fixed-top.app-navbar
+        .container.app-navbar-inner
+          .navbar-header
+            button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#navbar', aria-expanded='false', aria-controls='navbar', aria-label='Open navigation')
+              span.sr-only Toggle navigation
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.navbar-brand.app-brand(href='/')
+              span.app-brand-mark B
+              span.app-brand-copy
+                span.app-brand-title #{__('Blockchain Demo')}
+                span.app-brand-subtitle Interactive cryptography lab
+          #navbar.collapse.navbar-collapse
+            ul.nav.navbar-nav.navbar-right.app-nav
+              li.dropdown(class={active: page === 'hash' || page === 'block' || page === 'blockchain' || page === 'distributed' || page === 'tokens' || page === 'coinbase'})
+                a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                  | Core Lab
+                  span.caret
+                ul.dropdown-menu
+                  li.dropdown-header Core Modules
+                  li(class={active: page === 'hash'})
+                    a(href='/hash') Hash
+                  li(class={active: page === 'block'})
+                    a(href='/block') Block
+                  li(class={active: page === 'blockchain'})
+                    a(href='/blockchain') Blockchain
+                  li(class={active: page === 'distributed'})
+                    a(href='/distributed') Distributed
+                  li.divider(role='separator')
+                  li.dropdown-header Transactions
+                  li(class={active: page === 'tokens'})
+                    a(href='/tokens') Tokens
+                  li(class={active: page === 'coinbase'})
+                    a(href='/coinbase') Coinbase
+              li.dropdown(class={active: page === 'bitcoinblock' || page === 'attack51' || page === 'mempool'})
+                a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                  | Bitcoin
+                  span.caret
+                ul.dropdown-menu
+                  li.dropdown-header Advanced
+                  li(class={active: page === 'bitcoinblock'})
+                    a(href='/bitcoinblock') Real Bitcoin Block
+                  li(class={active: page === 'attack51'})
+                    a(href='/attack51') 51% Attack Simulator
+                  li(class={active: page === 'mempool'})
+                    a(href='/mempool') Mempool &amp; Fees
+              li(class={active: page === 'theory'})
+                a(href='/theory') Theory
+              li.dropdown(class={active: page === 'keys' || page === 'signatures' || page === 'transaction'})
+                a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                  | Keys
+                  span.caret
+                ul.dropdown-menu.dropdown-menu-right
+                  li.dropdown-header Public / Private Key Cryptography
+                  li(class={active: page === 'keys'})
+                    a(href='/keys') Key Pairs
+                  li(class={active: page === 'signatures'})
+                    a(href='/signatures') Signatures
+                  li(class={active: page === 'transaction'})
+                    a(href='/transaction') Transaction
+              li(class={active: page === 'classroom'})
+                a.app-nav-highlight(href='/classroom') Classroom Mode
+              li.dropdown
+                a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                  span#difficulty-label Difficulty: 4
+                  span.caret
+                ul.dropdown-menu.dropdown-menu-right
+                  li.dropdown-header Leading zeros required
+                  li.difficulty-option#difficulty-1
+                    a(href='#', onclick='setDifficulty(1); return false;') 1 zero - instant
+                  li.difficulty-option#difficulty-2
+                    a(href='#', onclick='setDifficulty(2); return false;') 2 zeros - seconds
+                  li.difficulty-option#difficulty-3
+                    a(href='#', onclick='setDifficulty(3); return false;') 3 zeros - about 1 minute
+                  li.difficulty-option.active#difficulty-4
+                    a(href='#', onclick='setDifficulty(4); return false;') 4 zeros - about 15 min (default)
+                  li.difficulty-option#difficulty-5
+                    a(href='#', onclick='setDifficulty(5); return false;') 5 zeros - about 4 hours
+                  li.difficulty-option#difficulty-6
+                    a(href='#', onclick='setDifficulty(6); return false;') 6 zeros - about 3 days
 
-    block content
+      main#main-content.app-main
+        block content
+
+      footer.app-footer
+        .container.app-footer-inner
+          p.app-footer-copy
+            | Interactive blockchain teaching toolkit for classroom demos, lab sessions and live discussion.
+          p.app-footer-links
+            a(href='/') Home
+            |  / 
+            a(href='/classroom') Classroom Mode
+            |  / 
+            a(href='/theory') Theory

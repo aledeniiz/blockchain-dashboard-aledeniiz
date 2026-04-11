@@ -2,134 +2,169 @@ extends layout
 
 block content
   .home-hero
-    .container
-      .home-hero-badge Educational Tool
-      h1.home-hero-title Blockchain Demo
-      p.home-hero-subtitle
-        | An interactive, step-by-step visualization of how a blockchain works —
-        | from hashing a single value to a fully distributed ledger.
-      p.home-hero-meta
-        | Designed for classroom use &middot; Universidad Alfonso X el Sabio &middot; Cryptography
+    .container.home-hero-grid
+      .home-hero-copy
+        .home-hero-badge Educational Platform
+        h1.home-hero-title Blockchain Labs for Modern Cryptography Classes
+        p.home-hero-subtitle
+          | A clearer, more product-like front door for the demo: students can explore hashing,
+          | consensus, mining, fees and signatures as one connected learning system.
+        .home-hero-actions
+          a.btn.btn-primary.btn-lg(href='/classroom') Open Classroom Mode
+          a.btn.btn-default.btn-lg(href='/theory') Review Theory
+        .home-hero-meta
+          span Built for live teaching
+          span Visual + interactive
+          span Ready for multiplayer evolution
+      .home-hero-visual
+        .home-signal-card
+          p.home-signal-label Live Lab
+          h2.home-signal-title Shared chain. Shared mempool. Shared discussion.
+          .home-signal-metrics
+            .home-signal-metric
+              strong 10+
+              span modules
+            .home-signal-metric
+              strong 3
+              span peer views
+            .home-signal-metric
+              strong 1
+              span class code
+        .home-mini-ledger
+          .home-mini-ledger-row
+            span Block 1
+            em Valid
+          .home-mini-ledger-row
+            span Block 2
+            em Mined
+          .home-mini-ledger-row.home-mini-ledger-row-alert
+            span Block 3
+            em Fork detected
 
-  .container.home-modules
-    .row
-      .col-sm-6.col-md-4
-        a.home-card(href='/hash')
-          .home-card-icon
-            span.glyphicon.glyphicon-lock
-          h3 Hash Function
-          p
-            | Type any text and see its SHA-256 digest update in real time.
-            | Understand why even a single character change produces a completely different hash.
-      .col-sm-6.col-md-4
-        a.home-card(href='/block')
-          .home-card-icon
-            span.glyphicon.glyphicon-th-large
-          h3 Block
-          p
-            | Add a nonce to the data and mine until the hash meets the required difficulty target
-            | (leading zeros). See Proof-of-Work in action.
-      .col-sm-6.col-md-4
-        a.home-card(href='/blockchain')
-          .home-card-icon
-            span.glyphicon.glyphicon-link
-          h3 Blockchain
-          p
-            | Chain blocks together using each block&rsquo;s hash as the previous block pointer.
-            | Tamper with one block and watch the entire chain break.
-      .col-sm-6.col-md-4
-        a.home-card(href='/distributed')
-          .home-card-icon
-            span.glyphicon.glyphicon-globe
-          h3 Distributed
-          p
-            | Replicate the chain across multiple peers. Modify one peer&rsquo;s data and see
-            | how the network detects and rejects the tampered copy.
-      .col-sm-6.col-md-4
-        a.home-card(href='/tokens')
-          .home-card-icon
-            span.glyphicon.glyphicon-transfer
-          h3 Tokens
-          p
-            | Replace raw data with financial transactions. See how a blockchain
-            | records who sends how much to whom without a central bank.
-      .col-sm-6.col-md-4
-        a.home-card(href='/coinbase')
-          .home-card-icon
-            span.glyphicon.glyphicon-star
-          h3 Coinbase
-          p
-            | Add a special coinbase transaction that creates new coins from nothing —
-            | the mechanism by which miners are rewarded.
-      .col-sm-6.col-md-4
-        a.home-card.home-card-mempool(href='/mempool')
-          .home-card-icon.home-card-icon-mempool
-            span 📨
-          h3 Mempool &amp; Fees
-          p
-            | Simulate the transaction queue. Be the miner — pick the highest-fee transactions,
-            | fill a block, and collect your reward. Try RBF fee bumping.
-      .col-sm-6.col-md-4
-        a.home-card.home-card-attack(href='/attack51')
-          .home-card-icon.home-card-icon-attack
-            span ⚔
-          h3 51% Attack
-          p
-            | Simulate a double-spend attack step by step.
-            | Choose the attacker's hash power and see whether the honest network survives.
-      .col-sm-6.col-md-4
-        a.home-card.home-card-bitcoin(href='/bitcoinblock')
-          .home-card-icon.home-card-icon-bitcoin
-            span ₿
-          h3 Real Bitcoin Block
-          p
-            | Explore the actual 80-byte header of the Genesis Block.
-            | Verify Satoshi&rsquo;s double-SHA256 hash live in the browser and mine your own valid block.
-      .col-sm-6.col-md-4
-        a.home-card.home-card-theory(href='/theory')
-          .home-card-icon.home-card-icon-theory
-            span.glyphicon.glyphicon-education
-          h3 Block Theory
-          p
-            | Understand the anatomy of a Bitcoin block: every header field explained,
-            | how blocks chain together, Merkle trees, and Proof of Work.
+  .container.home-overview
+    .home-section-intro
+      p.home-section-eyebrow Product Map
+      h2.home-section-heading Choose the concept you want to teach
+      p.home-section-lead
+        | The homepage is now organized as a guided catalogue: first the teaching direction,
+        | then the modules grouped by concept, and finally the classroom-specific layer.
 
-  .container.home-modules.home-modules-keys
-    h3.home-section-title
-      span.glyphicon.glyphicon-lock
-      |  Keys &amp; Digital Signatures
-    p.home-section-subtitle
-      | Understand the cryptographic foundation behind every blockchain transaction:
-      | key pairs, signing, and verification using the secp256k1 elliptic curve (same as Bitcoin &amp; Ethereum).
-    .row
-      .col-sm-6.col-md-4
-        a.home-card.home-card-key(href='/keys')
-          .home-card-icon.home-card-icon-key
-            span.glyphicon.glyphicon-lock
-          h3 Key Pairs
-          p
-            | Generate a public / private key pair using the secp256k1 elliptic curve.
-            | Understand how the public key is derived from the private key — and why it cannot be reversed.
-      .col-sm-6.col-md-4
-        a.home-card.home-card-key(href='/signatures')
-          .home-card-icon.home-card-icon-key
-            span.glyphicon.glyphicon-pencil
-          h3 Signatures
-          p
-            | Sign any message with your private key and verify it with the public key.
-            | Change one character in the message — the signature breaks instantly.
-      .col-sm-6.col-md-4
-        a.home-card.home-card-key(href='/transaction')
-          .home-card-icon.home-card-icon-key
-            span.glyphicon.glyphicon-transfer
-          h3 Transaction
-          p
-            | Sign a payment transaction (amount + sender + recipient).
-            | See why changing the amount or recipient after signing makes the transaction invalid.
+    .home-summary-grid
+      .home-summary-card
+        p.home-summary-kicker Learning Path
+        h3 From hash to consensus
+        p Start with core blockchain causality before moving into economic or adversarial scenarios.
+      .home-summary-card
+        p.home-summary-kicker Classroom Use
+        h3 Individual exploration or live demo
+        p Each module can work alone, but the structure now makes the overall teaching flow much easier to scan.
+      .home-summary-card
+        p.home-summary-kicker New Capability
+        h3 Multiuser classroom mode
+        p Teacher and students can now share the same mempool and chain state in one live room.
+
+    .home-section-stack
+      .home-module-band
+        .home-band-head
+          div
+            p.home-section-eyebrow Foundations
+            h3 Core Chain Concepts
+          p Build intuition from one hash to a distributed ledger.
+        .home-cards-grid.home-cards-grid-two
+          a.home-card(href='/hash')
+            .home-card-kicker Foundations
+            h3 Hash Function
+            p Explore SHA-256 and the avalanche effect in real time.
+          a.home-card(href='/block')
+            .home-card-kicker Mining
+            h3 Block
+            p Tune the nonce and see proof of work emerge from repeated hashing.
+          a.home-card(href='/blockchain')
+            .home-card-kicker Integrity
+            h3 Blockchain
+            p Watch a single change cascade through the full chain.
+          a.home-card(href='/distributed')
+            .home-card-kicker Consensus
+            h3 Distributed
+            p Compare multiple peers and make ledger disagreement visible.
+
+      .home-module-band
+        .home-band-head
+          div
+            p.home-section-eyebrow Market & Attacks
+            h3 Bitcoin Mechanics
+          p Push the class toward realistic economic and adversarial scenarios.
+        .home-cards-grid.home-cards-grid-two
+          a.home-card.home-card-mempool(href='/mempool')
+            .home-card-kicker Market Dynamics
+            h3 Mempool &amp; Fees
+            p Prioritize transactions, collect fees and explain blockspace scarcity.
+          a.home-card.home-card-attack(href='/attack51')
+            .home-card-kicker Adversarial Thinking
+            h3 51% Attack
+            p Simulate a double-spend race and discuss why hash power concentration matters.
+          a.home-card.home-card-bitcoin(href='/bitcoinblock')
+            .home-card-kicker Authentic Data
+            h3 Real Bitcoin Block
+            p Inspect a real block header and verify its hashing logic live.
+          a.home-card.home-card-theory(href='/theory')
+            .home-card-kicker Deep Dive
+            h3 Block Theory
+            p Connect the visuals to the formal structure described in Bitcoin.
+
+      .home-module-band
+        .home-band-head
+          div
+            p.home-section-eyebrow Identity & Verification
+            h3 Keys &amp; Signatures
+          p Complete the story from ledger state to transaction authenticity.
+        .home-cards-grid.home-cards-grid-three
+          a.home-card.home-card-key(href='/keys')
+            .home-card-kicker Identity
+            h3 Key Pairs
+            p Generate secp256k1 keys and explain one-way derivation.
+          a.home-card.home-card-key(href='/signatures')
+            .home-card-kicker Verification
+            h3 Signatures
+            p Sign any message and show how tampering breaks verification.
+          a.home-card.home-card-key(href='/transaction')
+            .home-card-kicker Payments
+            h3 Transaction
+            p Bind sender, recipient and amount into one signed record.
+
+      .home-module-band.home-module-band-accent
+        .home-band-head
+          div
+            p.home-section-eyebrow Classroom Layer
+            h3 Classroom Mode
+          p Run the demo as a shared live exercise instead of a single-browser walkthrough.
+        .home-classroom-grid
+          .home-feature-panel
+            .home-feature-panel-head
+              h3 What You Can Do
+            ul.home-feature-list
+              li Create a classroom room and share the code
+              li Let students broadcast transactions from their own devices
+              li Mine blocks against one shared mempool
+              li Reset the scenario or inject background traffic as teacher
+          .home-feature-panel.home-feature-panel-muted
+            .home-feature-panel-head
+              h3 Why It Works in Class
+            ul.home-feature-list
+              li It makes cryptographic causality visible.
+              li Students can break and repair state themselves.
+              li Advanced pages already support narrative teaching, not only sandbox play.
+              li The codebase is small enough to evolve quickly.
+          .home-feature-panel.home-feature-panel-cta
+            .home-feature-panel-head
+              h3 Start the Shared Lab
+            p
+              | Launch the multiuser classroom page to create a room and test the live workflow with your students.
+            a.btn.btn-block.btn-primary(href='/classroom') Open Classroom Mode
 
   .container
     p.home-attribution
-      | Original demo by&nbsp;
+      | Original demo by 
       a(href='http://andersbrownworth.com/') Anders Brownworth
-      | &nbsp;&middot;&nbsp;
+      |  / 
       a(href='https://github.com/anders94/blockchain-demo/') Source on GitHub
