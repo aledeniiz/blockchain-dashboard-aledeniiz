@@ -1,0 +1,309 @@
+extends layout
+
+block content
+  .container
+    .sbl-hero
+      .sbl-hero-copy
+        .sbl-eyebrow Integrated Scenario
+        h1 Signed Transaction Inside a Block
+        p.sbl-hero-subtitle
+          | This lab connects the previous pages into one realistic sequence:
+          | sign a transaction, verify it, accept it into the mempool, and only then mine it into a block.
+      .sbl-hero-side
+        .sbl-hero-note
+          strong Key rule:
+          |  miners should only include transactions whose signatures verify against the sender public key.
+
+    .sbl-steps
+      .sbl-step
+        span 1
+        strong Create transaction
+        p Amount, sender and recipient form the message.
+      .sbl-step
+        span 2
+        strong Sign
+        p The sender signs the transaction hash with the private key.
+      .sbl-step
+        span 3
+        strong Verify
+        p The network checks the signature before accepting the tx.
+      .sbl-step
+        span 4
+        strong Mine
+        p Only verified transactions should reach the candidate block.
+
+    .row
+      .col-md-5
+        .well.sbl-panel
+          h3.sbl-panel-title Transaction Composer
+          form.form-horizontal
+            .form-group
+              label.col-sm-3.control-label Amount
+              .col-sm-9
+                .input-group
+                  span.input-group-addon $
+                  input#sblAmount.form-control(type='text', value='20.00', autocomplete='off')
+            .form-group
+              label.col-sm-3.control-label From
+              .col-sm-9
+                textarea#sblFrom.form-control(rows='3', spellcheck='false')
+                span.help-block Sender public key. Loaded from your saved keys.
+            .form-group
+              label.col-sm-3.control-label To
+              .col-sm-9
+                textarea#sblTo.form-control(rows='3', spellcheck='false')
+                span.help-block Recipient public key.
+            .form-group
+              label.col-sm-3.control-label Private Key
+              .col-sm-9
+                input#sblPrivateKey.form-control(type='text', autocomplete='off', spellcheck='false')
+            .form-group
+              label.col-sm-3.control-label Tx Hash
+              .col-sm-9
+                input#sblTxHash.form-control.sbl-code(type='text', disabled)
+            .form-group
+              label.col-sm-3.control-label Signature
+              .col-sm-9
+                textarea#sblSignature.form-control.sbl-code(rows='3', spellcheck='false')
+            .form-group
+              .col-sm-offset-3.col-sm-9
+                .btn-group
+                  button#sblSignButton.btn.btn-primary(type='button') Sign Transaction
+                  button#sblTamperButton.btn.btn-default(type='button') Tamper Amount
+            .form-group
+              .col-sm-offset-3.col-sm-9
+                button#sblValidateButton.btn.btn-success(type='button') Verify and Add to Mempool
+
+          .sbl-status-wrap
+            .sbl-status#sblStatus Compose a transaction and sign it first.
+
+      .col-md-7
+        .well.sbl-panel
+          h3.sbl-panel-title Verification Before Mining
+          .sbl-check-grid
+            .sbl-check-card
+              .sbl-check-label Signed Message
+              .sbl-check-value#sblMessagePreview amount + from + to
+            .sbl-check-card
+              .sbl-check-label Verification Result
+              .sbl-check-value#sblVerifyResult Pending
+            .sbl-check-card
+              .sbl-check-label Mempool Admission
+              .sbl-check-value#sblAdmissionResult Waiting
+          .sbl-explainer
+            p
+              strong If the signature is valid:
+              |  the transaction enters the mempool and becomes eligible for mining.
+            p
+              strong If the signature is invalid:
+              |  the node should reject it. It must never reach the block.
+
+    .row.sbl-lab-row
+      .col-md-6
+        .well.sbl-panel
+          .sbl-panel-head
+            h3.sbl-panel-title Shared Mempool
+            button#sblMineButton.btn.btn-warning(type='button') Mine Valid Transactions
+          ul.sbl-list#sblMempoolList
+            li.sbl-empty No verified transactions in the mempool.
+      .col-md-6
+        .well.sbl-panel
+          h3.sbl-panel-title Candidate / Latest Block
+          .sbl-block-state#sblBlockState
+            p.sbl-empty Mine the mempool to build a block.
+          ul.sbl-list#sblBlockTxList
+
+    .well.well-sm.sbl-panel
+      h3.sbl-panel-title Event Feed
+      ul.sbl-feed#sblFeed
+        li.sbl-empty No events yet.
+
+  script.
+    var EC = elliptic.elliptic().ec;
+    var ec = new EC('secp256k1');
+    var keypair = ec.genKeyPair();
+    var defaultRecipient = '04cc955bf8e359cc7ebbb66f4c2dc616a93e8ba08e93d27996e20299ba92cba9cbd73c2ff46ed27a3727ba09486ba32b5ac35dd20c0adec020536996ca4d9f3d74';
+    var mempool = [];
+    var latestBlock = null;
+
+    function sblMessage() {
+      return $('#sblAmount').val().trim() + $('#sblFrom').val().trim() + $('#sblTo').val().trim();
+    }
+
+    function sblHash() {
+      return CryptoJS.SHA256(sblMessage()).toString();
+    }
+
+    function sblUpdateHashPreview() {
+      $('#sblTxHash').val(sblHash());
+      $('#sblMessagePreview').text('SHA256(amount + from + to)');
+    }
+
+    function sblSetStatus(message, type) {
+      $('#sblStatus').removeClass('sbl-status-ok sbl-status-error sbl-status-warn').addClass(type ? 'sbl-status-' + type : '').text(message);
+    }
+
+    function sblAddFeed(message, type) {
+      var cls = type ? 'sbl-feed-item sbl-feed-' + type : 'sbl-feed-item';
+      if ($('#sblFeed .sbl-empty').length) $('#sblFeed').empty();
+      $('#sblFeed').prepend('<li class="' + cls + '">' + message + '</li>');
+    }
+
+    function sblFormatTx(tx) {
+      return '<li class="sbl-list-item">' +
+        '<strong>$' + tx.amount + '</strong>' +
+        '<span>' + tx.validityLabel + '</span>' +
+        '<div class="sbl-list-meta">hash ' + tx.hash.substring(0, 14) + '... / sig ' + tx.signature.substring(0, 18) + '...</div>' +
+        '</li>';
+    }
+
+    function sblRenderMempool() {
+      if (!mempool.length) {
+        $('#sblMempoolList').html('<li class="sbl-empty">No verified transactions in the mempool.</li>');
+        return;
+      }
+      $('#sblMempoolList').html(mempool.map(sblFormatTx).join(''));
+    }
+
+    function sblRenderBlock() {
+      if (!latestBlock) {
+        $('#sblBlockState').html('<p class="sbl-empty">Mine the mempool to build a block.</p>');
+        $('#sblBlockTxList').empty();
+        return;
+      }
+      $('#sblBlockState').html(
+        '<div class="sbl-block-card">' +
+        '<div><span>Block hash</span><strong>' + latestBlock.hash.substring(0, 24) + '...</strong></div>' +
+        '<div><span>Merkle root</span><strong>' + latestBlock.merkle.substring(0, 24) + '...</strong></div>' +
+        '<div><span>Nonce</span><strong>' + latestBlock.nonce + '</strong></div>' +
+        '</div>'
+      );
+      $('#sblBlockTxList').html(latestBlock.transactions.map(sblFormatTx).join(''));
+    }
+
+    function sblVerifyCurrent() {
+      try {
+        var from = $('#sblFrom').val().trim();
+        var sig  = $('#sblSignature').val().trim();
+        if (!from || !sig) return false;
+        var tmpKey = ec.keyFromPublic(from, 'hex');
+        var binaryMessage = buffer.Buffer.from(sblHash(), 'hex');
+        return tmpKey.verify(binaryMessage, sig);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function sblSyncKeys() {
+      var privHex = keypair.getPrivate('hex');
+      var pubHex = keypair.getPublic('hex');
+      $('#sblPrivateKey').val(bigInt(privHex, 16).toString());
+      $('#sblFrom').val(pubHex);
+      if (!$('#sblTo').val()) $('#sblTo').val(defaultRecipient);
+      sblUpdateHashPreview();
+    }
+
+    $(function() {
+      if (Cookies.get('privateKey')) {
+        keypair = ec.keyFromPrivate(Cookies.get('privateKey'));
+      }
+      if (Cookies.get('publicKey')) {
+        $('#sblFrom').val(Cookies.get('publicKey'));
+      }
+      sblSyncKeys();
+      sblRenderMempool();
+      sblRenderBlock();
+
+      $('#sblAmount, #sblFrom, #sblTo').on('input', function() {
+        sblUpdateHashPreview();
+        $('#sblVerifyResult').text('Pending');
+        $('#sblAdmissionResult').text('Waiting');
+      });
+
+      $('#sblPrivateKey').on('input', function() {
+        $(this).val($(this).val().replace(/\D/g, ''));
+        if (!$(this).val()) return;
+        try {
+          keypair = ec.keyFromPrivate(bigInt($(this).val()).toString(16));
+          sblSyncKeys();
+        } catch (e) {}
+      });
+
+      $('#sblSignButton').on('click', function() {
+        try {
+          var binaryMessage = buffer.Buffer.from(sblHash(), 'hex');
+          var sigHex = buffer.Buffer.from(keypair.sign(binaryMessage).toDER()).toString('hex');
+          $('#sblSignature').val(sigHex);
+          $('#sblVerifyResult').text('Signed');
+          sblSetStatus('Transaction signed. Now verify it before adding it to the mempool.', 'ok');
+          sblAddFeed('Signed a transaction candidate.', 'info');
+        } catch (e) {
+          sblSetStatus('Could not sign the transaction.', 'error');
+        }
+      });
+
+      $('#sblTamperButton').on('click', function() {
+        var amount = parseFloat($('#sblAmount').val() || '0');
+        var tampered = (amount + 5).toFixed(2);
+        $('#sblAmount').val(tampered);
+        sblUpdateHashPreview();
+        $('#sblVerifyResult').text('Signature no longer matches');
+        sblSetStatus('The transaction was modified after signing. Verification should now fail.', 'warn');
+        sblAddFeed('Tampered with the transaction after signing.', 'warn');
+      });
+
+      $('#sblValidateButton').on('click', function() {
+        var valid = sblVerifyCurrent();
+        $('#sblVerifyResult').text(valid ? 'Valid signature' : 'Invalid signature');
+        if (!valid) {
+          $('#sblAdmissionResult').text('Rejected');
+          sblSetStatus('Rejected: the signature does not match the transaction data.', 'error');
+          sblAddFeed('Node rejected a tampered or unsigned transaction.', 'error');
+          return;
+        }
+
+        var tx = {
+          amount: $('#sblAmount').val().trim(),
+          from: $('#sblFrom').val().trim(),
+          to: $('#sblTo').val().trim(),
+          signature: $('#sblSignature').val().trim(),
+          hash: sblHash(),
+          validityLabel: 'Verified'
+        };
+        mempool.push(tx);
+        $('#sblAdmissionResult').text('Accepted into mempool');
+        sblSetStatus('Verified successfully. The transaction can now be mined.', 'ok');
+        sblAddFeed('Verified transaction and accepted it into the mempool.', 'ok');
+        sblRenderMempool();
+      });
+
+      $('#sblMineButton').on('click', function() {
+        if (!mempool.length) {
+          sblSetStatus('There are no verified transactions to mine.', 'warn');
+          return;
+        }
+
+        var leaves = mempool.map(function(tx) { return tx.hash; });
+        var merkle = computeMerkleRoot(leaves);
+        var nonce = 0;
+        var headerHash = '';
+        while (nonce <= maximumNonce) {
+          headerHash = CryptoJS.SHA256(merkle + nonce).toString();
+          if (headerHash.substr(0, patternLen) <= pattern) break;
+          nonce++;
+        }
+
+        latestBlock = {
+          transactions: mempool.slice(),
+          merkle: merkle,
+          nonce: nonce,
+          hash: headerHash
+        };
+
+        sblAddFeed('Miner verified the mempool and mined a block containing ' + latestBlock.transactions.length + ' signed transaction(s).', 'ok');
+        sblSetStatus('Block mined. Only previously verified transactions were included.', 'ok');
+        mempool = [];
+        sblRenderMempool();
+        sblRenderBlock();
+      });
+    });

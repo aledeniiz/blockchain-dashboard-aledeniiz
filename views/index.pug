@@ -2,8 +2,8 @@ extends layout
 
 block content
   .home-hero
-    .container.home-hero-grid
-      .home-hero-copy
+    .container
+      .home-hero-copy.home-hero-copy-single
         .home-hero-badge Educational Platform
         h1.home-hero-title Blockchain Labs for Modern Cryptography Classes
         p.home-hero-subtitle
@@ -16,30 +16,6 @@ block content
           span Built for live teaching
           span Visual + interactive
           span Ready for multiplayer evolution
-      .home-hero-visual
-        .home-signal-card
-          p.home-signal-label Live Lab
-          h2.home-signal-title Shared chain. Shared mempool. Shared discussion.
-          .home-signal-metrics
-            .home-signal-metric
-              strong 10+
-              span modules
-            .home-signal-metric
-              strong 3
-              span peer views
-            .home-signal-metric
-              strong 1
-              span class code
-        .home-mini-ledger
-          .home-mini-ledger-row
-            span Block 1
-            em Valid
-          .home-mini-ledger-row
-            span Block 2
-            em Mined
-          .home-mini-ledger-row.home-mini-ledger-row-alert
-            span Block 3
-            em Fork detected
 
   .container.home-overview
     .home-section-intro
@@ -118,7 +94,7 @@ block content
             p.home-section-eyebrow Identity & Verification
             h3 Keys &amp; Signatures
           p Complete the story from ledger state to transaction authenticity.
-        .home-cards-grid.home-cards-grid-three
+        .home-cards-grid.home-cards-grid-two
           a.home-card.home-card-key(href='/keys')
             .home-card-kicker Identity
             h3 Key Pairs
@@ -131,6 +107,10 @@ block content
             .home-card-kicker Payments
             h3 Transaction
             p Bind sender, recipient and amount into one signed record.
+          a.home-card.home-card-key(href='/signedblock')
+            .home-card-kicker Integrated Scenario
+            h3 Signed Block Lab
+            p Sign a transaction, verify it, add it to mempool and mine it into a block.
 
       .home-module-band.home-module-band-accent
         .home-band-head
