@@ -5,20 +5,20 @@ block content
     .sbl-hero
       .sbl-hero-copy
         .sbl-eyebrow Integrated Scenario
-        h1 Signed Transaction Inside a Block
+        h1 Signed Transaction, Address and Block
         p.sbl-hero-subtitle
           | This lab connects the previous pages into one realistic sequence:
-          | sign a transaction, verify it, accept it into the mempool, and only then mine it into a block.
+          | derive addresses from public keys, sign a transaction, verify it, accept it into the mempool, and only then mine it into a block.
       .sbl-hero-side
         .sbl-hero-note
-          strong Key rule:
-          |  miners should only include transactions whose signatures verify against the sender public key.
+          strong What the ledger shows:
+          |  not names, and usually not raw public keys. It shows public addresses derived cryptographically from those keys.
 
     .sbl-steps
       .sbl-step
         span 1
-        strong Create transaction
-        p Amount, sender and recipient form the message.
+        strong Derive address
+        p Private key -> public key -> address visible in the ledger.
       .sbl-step
         span 2
         strong Sign
@@ -26,11 +26,34 @@ block content
       .sbl-step
         span 3
         strong Verify
-        p The network checks the signature before accepting the tx.
+        p The node checks the signature and confirms that the public key matches the From address.
       .sbl-step
         span 4
         strong Mine
         p Only verified transactions should reach the candidate block.
+
+    .well.sbl-panel
+      h3.sbl-panel-title Why the Ledger Looks Pseudonymous
+      .sbl-check-grid
+        .sbl-check-card
+          .sbl-check-label Step 1
+          .sbl-check-value Private key
+          p.sbl-mini-copy A secret random number known only by the owner.
+        .sbl-check-card
+          .sbl-check-label Step 2
+          .sbl-check-value Public key
+          p.sbl-mini-copy Derived through elliptic curve cryptography. Easy to generate, infeasible to reverse.
+        .sbl-check-card
+          .sbl-check-label Step 3
+          .sbl-check-value Address
+          p.sbl-mini-copy A hashed representation of the public key. This is what appears in the ledger.
+      .sbl-explainer
+        p
+          strong Simplified demo flow:
+          |  Address = HASH(HASH(public key)).
+        p
+          | In real systems there are extra formatting and checksum steps, but pedagogically this captures the key idea:
+          | the ledger exposes an address, not the private key and not a real-world name.
 
     .row
       .col-md-5
@@ -44,19 +67,28 @@ block content
                   span.input-group-addon $
                   input#sblAmount.form-control(type='text', value='20.00', autocomplete='off')
             .form-group
-              label.col-sm-3.control-label From
-              .col-sm-9
-                textarea#sblFrom.form-control(rows='3', spellcheck='false')
-                span.help-block Sender public key. Loaded from your saved keys.
-            .form-group
-              label.col-sm-3.control-label To
-              .col-sm-9
-                textarea#sblTo.form-control(rows='3', spellcheck='false')
-                span.help-block Recipient public key.
-            .form-group
               label.col-sm-3.control-label Private Key
               .col-sm-9
                 input#sblPrivateKey.form-control(type='text', autocomplete='off', spellcheck='false')
+                span.help-block This remains secret. It is only used to sign.
+            .form-group
+              label.col-sm-3.control-label Sender Public Key
+              .col-sm-9
+                textarea#sblFromPublicKey.form-control(rows='3', spellcheck='false')
+            .form-group
+              label.col-sm-3.control-label From Address
+              .col-sm-9
+                input#sblFromAddress.form-control.sbl-code(type='text', disabled)
+                span.help-block This is what the ledger records as the sender.
+            .form-group
+              label.col-sm-3.control-label Recipient Public Key
+              .col-sm-9
+                textarea#sblToPublicKey.form-control(rows='3', spellcheck='false')
+            .form-group
+              label.col-sm-3.control-label To Address
+              .col-sm-9
+                input#sblToAddress.form-control.sbl-code(type='text', disabled)
+                span.help-block The recipient also appears in the ledger as an address.
             .form-group
               label.col-sm-3.control-label Tx Hash
               .col-sm-9
@@ -83,20 +115,32 @@ block content
           .sbl-check-grid
             .sbl-check-card
               .sbl-check-label Signed Message
-              .sbl-check-value#sblMessagePreview amount + from + to
+              .sbl-check-value#sblMessagePreview amount + from address + to address
             .sbl-check-card
-              .sbl-check-label Verification Result
+              .sbl-check-label Signature Check
               .sbl-check-value#sblVerifyResult Pending
+            .sbl-check-card
+              .sbl-check-label Address Check
+              .sbl-check-value#sblAddressResult Pending
+          .sbl-check-grid
+            .sbl-check-card
+              .sbl-check-label Ledger View
+              .sbl-check-value#sblLedgerPreview From address -> To address
             .sbl-check-card
               .sbl-check-label Mempool Admission
               .sbl-check-value#sblAdmissionResult Waiting
+            .sbl-check-card
+              .sbl-check-label Rule
+              .sbl-check-value Must pass both checks
           .sbl-explainer
             p
-              strong If the signature is valid:
-              |  the transaction enters the mempool and becomes eligible for mining.
+              strong Check 1:
+              |  verify the signature with the sender public key.
             p
-              strong If the signature is invalid:
-              |  the node should reject it. It must never reach the block.
+              strong Check 2:
+              |  derive the address from that public key and confirm it matches the From address shown in the transaction.
+            p
+              | Only then should the transaction be accepted by the node and become eligible for mining.
 
     .row.sbl-lab-row
       .col-md-6
@@ -122,21 +166,37 @@ block content
     var EC = elliptic.elliptic().ec;
     var ec = new EC('secp256k1');
     var keypair = ec.genKeyPair();
-    var defaultRecipient = '04cc955bf8e359cc7ebbb66f4c2dc616a93e8ba08e93d27996e20299ba92cba9cbd73c2ff46ed27a3727ba09486ba32b5ac35dd20c0adec020536996ca4d9f3d74';
+    var defaultRecipientPublicKey = '04cc955bf8e359cc7ebbb66f4c2dc616a93e8ba08e93d27996e20299ba92cba9cbd73c2ff46ed27a3727ba09486ba32b5ac35dd20c0adec020536996ca4d9f3d74';
     var mempool = [];
     var latestBlock = null;
 
+    function sblAddressFromPublicKey(publicKey) {
+      if (!publicKey) return '';
+      var first = CryptoJS.SHA256(publicKey).toString();
+      var second = CryptoJS.SHA256(first).toString();
+      return '1' + second.substring(0, 33);
+    }
+
     function sblMessage() {
-      return $('#sblAmount').val().trim() + $('#sblFrom').val().trim() + $('#sblTo').val().trim();
+      return $('#sblAmount').val().trim() + $('#sblFromAddress').val().trim() + $('#sblToAddress').val().trim();
     }
 
     function sblHash() {
       return CryptoJS.SHA256(sblMessage()).toString();
     }
 
+    function sblRefreshAddresses() {
+      var fromPublicKey = $('#sblFromPublicKey').val().trim();
+      var toPublicKey = $('#sblToPublicKey').val().trim();
+      $('#sblFromAddress').val(sblAddressFromPublicKey(fromPublicKey));
+      $('#sblToAddress').val(sblAddressFromPublicKey(toPublicKey));
+      $('#sblLedgerPreview').text($('#sblFromAddress').val().trim() + ' -> ' + $('#sblToAddress').val().trim());
+    }
+
     function sblUpdateHashPreview() {
+      sblRefreshAddresses();
       $('#sblTxHash').val(sblHash());
-      $('#sblMessagePreview').text('SHA256(amount + from + to)');
+      $('#sblMessagePreview').text('SHA256(amount + from address + to address)');
     }
 
     function sblSetStatus(message, type) {
@@ -153,6 +213,7 @@ block content
       return '<li class="sbl-list-item">' +
         '<strong>$' + tx.amount + '</strong>' +
         '<span>' + tx.validityLabel + '</span>' +
+        '<div class="sbl-list-meta">from ' + tx.fromAddress + ' -> ' + tx.toAddress + '</div>' +
         '<div class="sbl-list-meta">hash ' + tx.hash.substring(0, 14) + '... / sig ' + tx.signature.substring(0, 18) + '...</div>' +
         '</li>';
     }
@@ -181,12 +242,12 @@ block content
       $('#sblBlockTxList').html(latestBlock.transactions.map(sblFormatTx).join(''));
     }
 
-    function sblVerifyCurrent() {
+    function sblSignatureValid() {
       try {
-        var from = $('#sblFrom').val().trim();
-        var sig  = $('#sblSignature').val().trim();
-        if (!from || !sig) return false;
-        var tmpKey = ec.keyFromPublic(from, 'hex');
+        var fromPublicKey = $('#sblFromPublicKey').val().trim();
+        var sig = $('#sblSignature').val().trim();
+        if (!fromPublicKey || !sig) return false;
+        var tmpKey = ec.keyFromPublic(fromPublicKey, 'hex');
         var binaryMessage = buffer.Buffer.from(sblHash(), 'hex');
         return tmpKey.verify(binaryMessage, sig);
       } catch (e) {
@@ -194,12 +255,17 @@ block content
       }
     }
 
+    function sblAddressMatchesPublicKey() {
+      var derived = sblAddressFromPublicKey($('#sblFromPublicKey').val().trim());
+      return !!derived && derived === $('#sblFromAddress').val().trim();
+    }
+
     function sblSyncKeys() {
       var privHex = keypair.getPrivate('hex');
       var pubHex = keypair.getPublic('hex');
       $('#sblPrivateKey').val(bigInt(privHex, 16).toString());
-      $('#sblFrom').val(pubHex);
-      if (!$('#sblTo').val()) $('#sblTo').val(defaultRecipient);
+      $('#sblFromPublicKey').val(pubHex);
+      if (!$('#sblToPublicKey').val()) $('#sblToPublicKey').val(defaultRecipientPublicKey);
       sblUpdateHashPreview();
     }
 
@@ -208,15 +274,16 @@ block content
         keypair = ec.keyFromPrivate(Cookies.get('privateKey'));
       }
       if (Cookies.get('publicKey')) {
-        $('#sblFrom').val(Cookies.get('publicKey'));
+        $('#sblFromPublicKey').val(Cookies.get('publicKey'));
       }
       sblSyncKeys();
       sblRenderMempool();
       sblRenderBlock();
 
-      $('#sblAmount, #sblFrom, #sblTo').on('input', function() {
+      $('#sblAmount, #sblFromPublicKey, #sblToPublicKey').on('input', function() {
         sblUpdateHashPreview();
         $('#sblVerifyResult').text('Pending');
+        $('#sblAddressResult').text('Pending');
         $('#sblAdmissionResult').text('Waiting');
       });
 
@@ -235,8 +302,9 @@ block content
           var sigHex = buffer.Buffer.from(keypair.sign(binaryMessage).toDER()).toString('hex');
           $('#sblSignature').val(sigHex);
           $('#sblVerifyResult').text('Signed');
-          sblSetStatus('Transaction signed. Now verify it before adding it to the mempool.', 'ok');
-          sblAddFeed('Signed a transaction candidate.', 'info');
+          $('#sblAddressResult').text('Address prepared');
+          sblSetStatus('Transaction signed. Now verify signature and address before adding it to the mempool.', 'ok');
+          sblAddFeed('Signed a transaction that references ledger addresses, not user names.', 'info');
         } catch (e) {
           sblSetStatus('Could not sign the transaction.', 'error');
         }
@@ -248,32 +316,38 @@ block content
         $('#sblAmount').val(tampered);
         sblUpdateHashPreview();
         $('#sblVerifyResult').text('Signature no longer matches');
-        sblSetStatus('The transaction was modified after signing. Verification should now fail.', 'warn');
+        $('#sblAddressResult').text('Address unchanged');
+        sblSetStatus('The transaction was modified after signing. The address is still the same, but the signature should now fail.', 'warn');
         sblAddFeed('Tampered with the transaction after signing.', 'warn');
       });
 
       $('#sblValidateButton').on('click', function() {
-        var valid = sblVerifyCurrent();
-        $('#sblVerifyResult').text(valid ? 'Valid signature' : 'Invalid signature');
-        if (!valid) {
+        var signatureOk = sblSignatureValid();
+        var addressOk = sblAddressMatchesPublicKey();
+        $('#sblVerifyResult').text(signatureOk ? 'Valid signature' : 'Invalid signature');
+        $('#sblAddressResult').text(addressOk ? 'From address matches sender public key' : 'From address does not match sender public key');
+
+        if (!signatureOk || !addressOk) {
           $('#sblAdmissionResult').text('Rejected');
-          sblSetStatus('Rejected: the signature does not match the transaction data.', 'error');
-          sblAddFeed('Node rejected a tampered or unsigned transaction.', 'error');
+          sblSetStatus('Rejected: a node should accept the transaction only if both signature and address checks pass.', 'error');
+          sblAddFeed('Node rejected a transaction because validation failed.', 'error');
           return;
         }
 
         var tx = {
           amount: $('#sblAmount').val().trim(),
-          from: $('#sblFrom').val().trim(),
-          to: $('#sblTo').val().trim(),
+          fromAddress: $('#sblFromAddress').val().trim(),
+          toAddress: $('#sblToAddress').val().trim(),
+          fromPublicKey: $('#sblFromPublicKey').val().trim(),
+          toPublicKey: $('#sblToPublicKey').val().trim(),
           signature: $('#sblSignature').val().trim(),
           hash: sblHash(),
           validityLabel: 'Verified'
         };
         mempool.push(tx);
         $('#sblAdmissionResult').text('Accepted into mempool');
-        sblSetStatus('Verified successfully. The transaction can now be mined.', 'ok');
-        sblAddFeed('Verified transaction and accepted it into the mempool.', 'ok');
+        sblSetStatus('Verified successfully. The transaction can now be mined, and the ledger will show only the addresses.', 'ok');
+        sblAddFeed('Verified signature + address ownership and accepted the transaction into the mempool.', 'ok');
         sblRenderMempool();
       });
 
@@ -300,8 +374,8 @@ block content
           hash: headerHash
         };
 
-        sblAddFeed('Miner verified the mempool and mined a block containing ' + latestBlock.transactions.length + ' signed transaction(s).', 'ok');
-        sblSetStatus('Block mined. Only previously verified transactions were included.', 'ok');
+        sblAddFeed('Miner built a block from verified transactions whose ledger entries show only addresses.', 'ok');
+        sblSetStatus('Block mined. Notice that the block records From and To as addresses, while verification relied on the sender public key.', 'ok');
         mempool = [];
         sblRenderMempool();
         sblRenderBlock();

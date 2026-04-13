@@ -81,7 +81,7 @@ html
                     a(href='/mempool') Mempool &amp; Fees
               li(class={active: page === 'theory'})
                 a(href='/theory') Theory
-              li.dropdown(class={active: page === 'keys' || page === 'signatures' || page === 'transaction' || page === 'signedblock'})
+              li.dropdown(class={active: page === 'keys' || page === 'signatures' || page === 'transaction' || page === 'signedblock' || page === 'utxo'})
                 a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
                   | Keys
                   span.caret
@@ -95,6 +95,8 @@ html
                     a(href='/transaction') Transaction
                   li(class={active: page === 'signedblock'})
                     a(href='/signedblock') Signed Block Lab
+                  li(class={active: page === 'utxo'})
+                    a(href='/utxo') UTXO Lab
               li(class={active: page === 'classroom'})
                 a.app-nav-highlight(href='/classroom') Classroom Mode
               li.dropdown

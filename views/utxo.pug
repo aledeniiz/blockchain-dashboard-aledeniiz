@@ -1,0 +1,254 @@
+extends layout
+
+block content
+  .container
+    .utxo-hero
+      .utxo-hero-copy
+        .utxo-eyebrow Natural Next Step
+        h1 UTXO Validation Lab
+        p.utxo-hero-subtitle
+          | A valid signature proves who authorized a spend. A UTXO check proves whether that address
+          | actually has unspent outputs available to spend.
+      .utxo-hero-side
+        .utxo-note
+          strong Key idea:
+          |  Bitcoin does not store account balances like a bank. It stores
+          strong  unspent transaction outputs
+          |  that can be consumed as inputs in a new transaction.
+
+    .utxo-steps
+      .utxo-step
+        span 1
+        strong Find UTXOs
+        p Collect the outputs controlled by the sender address.
+      .utxo-step
+        span 2
+        strong Build Inputs
+        p Select enough unspent outputs to cover the payment.
+      .utxo-step
+        span 3
+        strong Create Outputs
+        p Send value to recipient and return change to sender.
+      .utxo-step
+        span 4
+        strong Validate
+        p Inputs must exist, must be unspent, and total input must cover total output.
+
+    .well.utxo-panel
+      h3.utxo-panel-title What "From" Really Means
+      p.utxo-copy
+        | In this demo, the
+        strong  From
+        |  field is shown as an
+        strong  address
+        |  derived from the sender public key. That is a good simplified teaching model.
+      p.utxo-copy
+        | In Bitcoin more precisely, the new transaction references previous
+        code  UTXOs
+        |  locked to that address or script, and the spender reveals the public key and signature
+        |  to unlock them. So:
+      ul.utxo-bullet-list
+        li The ledger shows an address or locking condition
+        li The spender proves control with public key + signature
+        li The node checks the referenced outputs are still unspent
+
+    .row
+      .col-md-5
+        .well.utxo-panel
+          h3.utxo-panel-title UTXO Set for the Sender
+          p.utxo-copy
+            | These are the unspent outputs currently controlled by the sender address.
+          ul.utxo-list#utxoAvailableList
+          .utxo-summary
+            span Total available
+            strong#utxoAvailableTotal 0 BTC
+
+      .col-md-7
+        .well.utxo-panel
+          h3.utxo-panel-title Build a Spend
+          form.form-horizontal
+            .form-group
+              label.col-sm-3.control-label From Address
+              .col-sm-9
+                input#utxoFromAddress.form-control.utxo-code(type='text', disabled)
+                span.help-block Derived from the saved sender public key.
+            .form-group
+              label.col-sm-3.control-label To Address
+              .col-sm-9
+                input#utxoToAddress.form-control.utxo-code(type='text')
+            .form-group
+              label.col-sm-3.control-label Amount
+              .col-sm-9
+                .input-group
+                  span.input-group-addon BTC
+                  input#utxoAmount.form-control(type='number', min='0.0001', step='0.0001', value='0.6000')
+            .form-group
+              label.col-sm-3.control-label Fee
+              .col-sm-9
+                .input-group
+                  span.input-group-addon BTC
+                  input#utxoFee.form-control(type='number', min='0.0001', step='0.0001', value='0.0005')
+            .form-group
+              .col-sm-offset-3.col-sm-9
+                .btn-group
+                  button#utxoPreviewButton.btn.btn-primary(type='button') Build Transaction
+                  button#utxoOverspendButton.btn.btn-default(type='button') Overspend Example
+
+          .utxo-status#utxoStatus Build a transaction to see how UTXOs are selected.
+
+    .row.utxo-lab-row
+      .col-md-6
+        .well.utxo-panel
+          h3.utxo-panel-title Selected Inputs
+          ul.utxo-list#utxoInputsList
+        .well.utxo-panel
+          h3.utxo-panel-title Outputs Created
+          ul.utxo-list#utxoOutputsList
+      .col-md-6
+        .well.utxo-panel
+          h3.utxo-panel-title Validation Checks
+          .utxo-check-grid
+            .utxo-check-card
+              .utxo-check-label Signature
+              .utxo-check-value Valid in previous lab
+            .utxo-check-card
+              .utxo-check-label Inputs exist
+              .utxo-check-value#utxoCheckExist Waiting
+            .utxo-check-card
+              .utxo-check-label Inputs cover outputs
+              .utxo-check-value#utxoCheckBalance Waiting
+            .utxo-check-card
+              .utxo-check-label Change output
+              .utxo-check-value#utxoCheckChange Waiting
+          .utxo-explainer
+            p
+              strong A signature alone is not enough.
+              |  The network must also prove that the chosen inputs exist and have not been spent before.
+            p
+              | If the selected UTXOs total more than the payment plus fee, the difference becomes
+              strong  change
+              |  back to the sender.
+        .well.utxo-panel
+          h3.utxo-panel-title Event Feed
+          ul.utxo-feed#utxoFeed
+            li.utxo-empty No events yet.
+
+  script.
+    var senderPublicKey = Cookies.get('publicKey') || '04cc955bf8e359cc7ebbb66f4c2dc616a93e8ba08e93d27996e20299ba92cba9cbd73c2ff46ed27a3727ba09486ba32b5ac35dd20c0adec020536996ca4d9f3d74';
+    var recipientPublicKey = '0431e6d4b6d767f1a5af4d2d3f3e2fbc3342ad00f60a6d44f5c6f5ef8e3fd75b19d62e68d7dc6c9d9d6d1d8a2a2ca9f3d76f9b12b3afbb0650c74f2442e2b6423a';
+    var utxoSet = [];
+
+    function utxoAddressFromPublicKey(publicKey) {
+      var first = CryptoJS.SHA256(publicKey).toString();
+      var second = CryptoJS.SHA256(first).toString();
+      return '1' + second.substring(0, 33);
+    }
+
+    function btc(value) {
+      return Number(value).toFixed(4) + ' BTC';
+    }
+
+    function setUtxoStatus(message, kind) {
+      $('#utxoStatus').removeClass('utxo-status-ok utxo-status-error utxo-status-warn').addClass(kind ? 'utxo-status-' + kind : '').text(message);
+    }
+
+    function addUtxoFeed(message, kind) {
+      var cls = kind ? 'utxo-feed-item utxo-feed-' + kind : 'utxo-feed-item';
+      if ($('#utxoFeed .utxo-empty').length) $('#utxoFeed').empty();
+      $('#utxoFeed').prepend('<li class="' + cls + '">' + message + '</li>');
+    }
+
+    function renderUtxoSet() {
+      var total = utxoSet.reduce(function(sum, item) { return sum + item.amount; }, 0);
+      $('#utxoAvailableList').html(utxoSet.map(function(item) {
+        return '<li class="utxo-list-item"><strong>' + item.txid + ':' + item.index + '</strong><span>' + btc(item.amount) + '</span></li>';
+      }).join(''));
+      $('#utxoAvailableTotal').text(btc(total));
+    }
+
+    function renderList(nodeId, items, emptyMessage) {
+      if (!items.length) {
+        $(nodeId).html('<li class="utxo-empty">' + emptyMessage + '</li>');
+        return;
+      }
+      $(nodeId).html(items.join(''));
+    }
+
+    function selectInputs(target) {
+      var sum = 0;
+      var selected = [];
+      for (var i = 0; i < utxoSet.length; i++) {
+        if (sum >= target) break;
+        selected.push(utxoSet[i]);
+        sum += utxoSet[i].amount;
+      }
+      return { selected: selected, total: sum };
+    }
+
+    function buildSpend() {
+      var amount = parseFloat($('#utxoAmount').val() || '0');
+      var fee = parseFloat($('#utxoFee').val() || '0');
+      var recipient = $('#utxoToAddress').val().trim();
+      var needed = amount + fee;
+      var selection = selectInputs(needed);
+      var inputsExist = selection.selected.length > 0;
+      var enoughBalance = selection.total >= needed;
+      var change = enoughBalance ? selection.total - needed : 0;
+
+      renderList('#utxoInputsList', selection.selected.map(function(item) {
+        return '<li class="utxo-list-item"><strong>Input from ' + item.txid + ':' + item.index + '</strong><span>' + btc(item.amount) + '</span></li>';
+      }), 'No inputs selected yet.');
+
+      var outputs = [];
+      if (amount > 0 && recipient) {
+        outputs.push('<li class="utxo-list-item"><strong>Recipient output</strong><span>' + recipient + ' / ' + btc(amount) + '</span></li>');
+      }
+      if (change > 0) {
+        outputs.push('<li class="utxo-list-item"><strong>Change output</strong><span>' + $('#utxoFromAddress').val().trim() + ' / ' + btc(change) + '</span></li>');
+      }
+      renderList('#utxoOutputsList', outputs, 'No outputs created yet.');
+
+      $('#utxoCheckExist').text(inputsExist ? 'Inputs selected' : 'No inputs');
+      $('#utxoCheckBalance').text(enoughBalance ? 'Covered' : 'Insufficient');
+      $('#utxoCheckChange').text(change > 0 ? btc(change) : (enoughBalance ? 'No change' : 'Not possible'));
+
+      if (!inputsExist) {
+        setUtxoStatus('No UTXOs available for this address.', 'error');
+        addUtxoFeed('Validation failed: no spendable outputs were found for the sender address.', 'error');
+        return;
+      }
+
+      if (!enoughBalance) {
+        setUtxoStatus('Rejected: the signature could be valid, but the selected UTXOs do not cover amount + fee.', 'error');
+        addUtxoFeed('Validation failed: total input is lower than total output plus fee.', 'error');
+        return;
+      }
+
+      setUtxoStatus('Valid spend: the network can form inputs, create outputs and return change.', 'ok');
+      addUtxoFeed('Built a valid transaction from UTXOs. Change returns to the sender address.', 'ok');
+    }
+
+    $(function() {
+      var senderAddress = utxoAddressFromPublicKey(senderPublicKey);
+      var recipientAddress = utxoAddressFromPublicKey(recipientPublicKey);
+
+      $('#utxoFromAddress').val(senderAddress);
+      $('#utxoToAddress').val(recipientAddress);
+
+      utxoSet = [
+        { txid: 'a13f9c88d2b1', index: 0, amount: 0.4500, owner: senderAddress },
+        { txid: 'bc80d19a771e', index: 1, amount: 0.3000, owner: senderAddress },
+        { txid: 'f91ab44e6d03', index: 0, amount: 0.2000, owner: senderAddress }
+      ];
+
+      renderUtxoSet();
+
+      $('#utxoPreviewButton').on('click', function() {
+        buildSpend();
+      });
+
+      $('#utxoOverspendButton').on('click', function() {
+        $('#utxoAmount').val('1.2000');
+        buildSpend();
+      });
+    });
