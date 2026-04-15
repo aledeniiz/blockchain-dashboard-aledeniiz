@@ -1,23 +1,8 @@
 """
-modules/m3_difficulty.py
-M3 — Difficulty History
-
-Bitcoin adjusts its difficulty every 2016 blocks (~2 weeks) so that
-the average block time stays at 600 seconds.
-
-Adjustment formula (Section 6.1 of Bitcoin whitepaper):
-  new_difficulty = old_difficulty * (actual_time / target_time)
-  where target_time = 2016 * 600 = 1,209,600 seconds (2 weeks)
-  Capped: adjustment is limited to a factor of 4 in either direction.
-
-This module:
-  1. Fetches blocks at each difficulty adjustment height to build history.
-  2. Plots difficulty over time.
-  3. Marks each adjustment event.
-  4. Shows ratio = actual_block_time / 600s for each period.
+modules/m3_difficulty.py  —  M3: Difficulty History
+Adjustment every 2016 blocks (~2 weeks): new_diff = old_diff × (target_time / actual_time).
 """
 
-import time
 import requests
 import pandas as pd
 import plotly.graph_objects as go
@@ -25,138 +10,175 @@ import streamlit as st
 
 from api.blockchain_client import BASE_URL, bits_to_difficulty
 
-ADJUSTMENT_PERIOD = 2016   # blocks per difficulty epoch
-TARGET_BLOCK_TIME = 600    # seconds
+ADJUSTMENT_PERIOD = 2016
+TARGET_TIME       = 600   # seconds
 
+
+# ── data fetching ──────────────────────────────────────────────────────────────
 
 def fetch_difficulty_history(n_periods: int = 10) -> pd.DataFrame:
-    """
-    Fetch the first block of the last n_periods difficulty epochs.
-    Returns a DataFrame with columns:
-      height, timestamp, bits, difficulty, actual_block_time, ratio
-    """
-    # Get current height
-    tip_height = int(requests.get(f"{BASE_URL}/blocks/tip/height", timeout=10).text.strip())
-
-    # Compute adjustment heights (heights that are multiples of 2016)
-    current_epoch_start = (tip_height // ADJUSTMENT_PERIOD) * ADJUSTMENT_PERIOD
-    heights = [current_epoch_start - i * ADJUSTMENT_PERIOD for i in range(n_periods)]
-    heights = [h for h in heights if h >= 0]
-    heights.sort()
+    tip = int(requests.get(f"{BASE_URL}/blocks/tip/height", timeout=15).text.strip())
+    current_epoch = (tip // ADJUSTMENT_PERIOD) * ADJUSTMENT_PERIOD
+    heights = sorted([current_epoch - i * ADJUSTMENT_PERIOD
+                      for i in range(n_periods) if current_epoch - i * ADJUSTMENT_PERIOD >= 0])
 
     rows = []
-    for height in heights:
-        url = f"{BASE_URL}/block-height/{height}"
-        block_hash = requests.get(url, timeout=10).text.strip()
-        block = requests.get(f"{BASE_URL}/block/{block_hash}", timeout=10).json()
+    for h in heights:
+        bh  = requests.get(f"{BASE_URL}/block-height/{h}", timeout=15).text.strip()
+        blk = requests.get(f"{BASE_URL}/block/{bh}", timeout=15).json()
 
-        # Get the LAST block of this epoch (height + 2015) for actual time calculation
-        end_height = height + ADJUSTMENT_PERIOD - 1
-        end_hash_resp = requests.get(f"{BASE_URL}/block-height/{end_height}", timeout=10)
-        if end_hash_resp.status_code == 200:
-            end_hash = end_hash_resp.text.strip()
-            end_block = requests.get(f"{BASE_URL}/block/{end_hash}", timeout=10).json()
-            actual_time = end_block["timestamp"] - block["timestamp"]
-        else:
-            actual_time = None
+        # epoch end block for actual time
+        end_h  = h + ADJUSTMENT_PERIOD - 1
+        end_r  = requests.get(f"{BASE_URL}/block-height/{end_h}", timeout=15)
+        actual = None
+        if end_r.status_code == 200:
+            eb      = requests.get(f"{BASE_URL}/block/{end_r.text.strip()}", timeout=15).json()
+            actual  = eb["timestamp"] - blk["timestamp"]
 
-        difficulty = bits_to_difficulty(block["bits"])
-        avg_block_time = (actual_time / ADJUSTMENT_PERIOD) if actual_time else None
-        ratio = (avg_block_time / TARGET_BLOCK_TIME) if avg_block_time else None
+        diff     = bits_to_difficulty(blk["bits"])
+        avg_time = actual / ADJUSTMENT_PERIOD if actual else None
+        ratio    = avg_time / TARGET_TIME if avg_time else None
 
         rows.append({
-            "height": height,
-            "timestamp": pd.Timestamp(block["timestamp"], unit="s"),
-            "bits": block["bits"],
-            "difficulty": difficulty,
-            "actual_total_seconds": actual_time,
-            "avg_block_time_s": avg_block_time,
-            "ratio": ratio,
+            "height":        h,
+            "timestamp":     pd.Timestamp(blk["timestamp"], unit="s"),
+            "difficulty":    diff,
+            "avg_block_s":   avg_time,
+            "ratio":         ratio,
+            "change_pct":    None,
         })
 
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    df["change_pct"] = df["difficulty"].pct_change() * 100
+    return df
 
+
+# ── render ─────────────────────────────────────────────────────────────────────
 
 def render(df: pd.DataFrame | None = None):
-    """Render M3 panel in Streamlit."""
-    st.subheader("M3 · Difficulty History")
-
-    n_periods = st.slider("Number of difficulty epochs", min_value=5, max_value=20, value=10)
+    # ── controls ───────────────────────────────────────────────────────────────
+    st.markdown("### 📈 Difficulty Adjustment History")
+    n_periods = st.slider("Epochs to display (1 epoch = 2 016 blocks ≈ 2 weeks)",
+                          min_value=5, max_value=20, value=10)
 
     if df is None or len(df) < 2:
-        with st.spinner(f"Fetching {n_periods} difficulty epochs (one API call per epoch)..."):
+        with st.spinner(f"Fetching {n_periods} epochs from mempool.space…"):
             try:
                 df = fetch_difficulty_history(n_periods)
             except Exception as e:
-                st.error(f"Error fetching difficulty history: {e}")
+                st.error(f"Error: {e}")
                 return
 
-    # --- Difficulty over time ---
+    latest = df.iloc[-1]
+
+    # ── KPIs ───────────────────────────────────────────────────────────────────
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Current Difficulty",  f"{latest['difficulty']/1e12:.2f} T")
+    c2.metric("Epoch Start Block",   f"#{int(latest['height']):,}")
+    if pd.notna(latest["avg_block_s"]) and latest["avg_block_s"]:
+        c3.metric("Avg Block Time",  f"{latest['avg_block_s']:.0f} s  ({latest['avg_block_s']/60:.1f} min)")
+    else:
+        c3.metric("Avg Block Time", "Epoch in progress")
+    if pd.notna(latest["change_pct"]):
+        delta_str = f"{latest['change_pct']:+.2f}%"
+        c4.metric("Last Adjustment", delta_str,
+                  delta=delta_str,
+                  delta_color="inverse" if latest["change_pct"] < 0 else "normal")
+
+    st.divider()
+
+    # ── difficulty line chart ──────────────────────────────────────────────────
     fig = go.Figure()
+
     fig.add_trace(go.Scatter(
-        x=df["timestamp"], y=df["difficulty"] / 1e12,
+        x=df["timestamp"],
+        y=df["difficulty"] / 1e12,
         mode="lines+markers",
         name="Difficulty (T)",
-        line=dict(color="#F7931A", width=2),
-        marker=dict(size=8, symbol="circle"),
+        line=dict(color="#F7931A", width=2.5),
+        marker=dict(size=9, color="#F7931A", line=dict(color="#fff", width=1.5)),
+        fill="tozeroy",
+        fillcolor="rgba(247,147,26,0.08)",
+        hovertemplate="<b>%{x|%b %d %Y}</b><br>Difficulty: %{y:.2f} T<extra></extra>",
     ))
 
-    # Mark adjustment events
+    # Adjustment markers
     for _, row in df.iterrows():
         fig.add_vline(
             x=row["timestamp"].timestamp() * 1000,
-            line=dict(color="rgba(255,255,255,0.2)", dash="dot"),
+            line=dict(color="rgba(255,255,255,0.12)", dash="dot", width=1),
         )
 
     fig.update_layout(
-        title="Bitcoin Difficulty over Time (per 2016-block epoch)",
-        xaxis_title="Date",
-        yaxis_title="Difficulty (Tera)",
         template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(15,15,26,0.8)",
+        xaxis=dict(title="Date", gridcolor="#2d2d4e"),
+        yaxis=dict(title="Difficulty (Tera)", gridcolor="#2d2d4e"),
+        legend=dict(orientation="h"),
+        margin=dict(t=10, b=40),
+        height=340,
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Ratio actual/target block time ---
-    df_ratio = df.dropna(subset=["ratio"])
-    if not df_ratio.empty:
-        fig2 = go.Figure()
-        colors = ["#2ecc71" if r <= 1 else "#e74c3c" for r in df_ratio["ratio"]]
+    # ── ratio bar chart ────────────────────────────────────────────────────────
+    df_r = df.dropna(subset=["ratio"])
+    if not df_r.empty:
+        colors = ["#2ecc71" if r <= 1 else "#e74c3c" for r in df_r["ratio"]]
+        fig2   = go.Figure()
         fig2.add_trace(go.Bar(
-            x=df_ratio["timestamp"],
-            y=df_ratio["ratio"],
+            x=df_r["timestamp"],
+            y=df_r["ratio"],
             marker_color=colors,
-            name="Actual/Target time ratio",
+            name="Actual / Target time",
+            hovertemplate=(
+                "<b>%{x|%b %d %Y}</b><br>"
+                "Ratio: %{y:.3f}<br>"
+                "<i>< 1 → faster (↑ diff)  |  > 1 → slower (↓ diff)</i>"
+                "<extra></extra>"
+            ),
         ))
-        fig2.add_hline(y=1.0, line=dict(color="white", dash="dash"), annotation_text="Target (1.0 = 600s)")
+        fig2.add_hline(y=1.0,
+                       line=dict(color="white", dash="dash", width=1.5),
+                       annotation_text="Target: 10 min/block",
+                       annotation_font_color="#ffffff")
         fig2.update_layout(
-            title="Ratio: Actual avg block time / 600s per epoch (green=faster, red=slower)",
-            xaxis_title="Epoch start date",
-            yaxis_title="Ratio",
             template="plotly_dark",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(15,15,26,0.8)",
+            xaxis=dict(title="Epoch start date", gridcolor="#2d2d4e"),
+            yaxis=dict(title="Actual time / 600 s", gridcolor="#2d2d4e"),
+            margin=dict(t=10, b=40),
+            height=280,
         )
+        st.caption("🟢 Green = blocks found faster than 10 min (difficulty will rise)  ·  🔴 Red = slower (difficulty will drop)")
         st.plotly_chart(fig2, use_container_width=True)
 
-    # --- Data table ---
-    display_df = df[["height", "timestamp", "difficulty", "avg_block_time_s", "ratio"]].copy()
-    display_df["difficulty"] = (display_df["difficulty"] / 1e12).round(2).astype(str) + " T"
-    display_df["avg_block_time_s"] = display_df["avg_block_time_s"].apply(
-        lambda x: f"{x:.0f}s ({x/60:.1f} min)" if x else "—"
-    )
-    display_df["ratio"] = display_df["ratio"].apply(lambda x: f"{x:.3f}" if x else "—")
-    display_df.columns = ["Epoch height", "Date", "Difficulty", "Avg block time", "Ratio vs 600s"]
-    st.dataframe(display_df, use_container_width=True)
+    st.divider()
 
-    with st.expander("Difficulty adjustment formula"):
-        st.markdown(
-            """
-            Every **2016 blocks** (~2 weeks), Bitcoin nodes recalculate the difficulty:
+    # ── data table ─────────────────────────────────────────────────────────────
+    st.markdown("### 🗒️ Epoch Summary")
+    disp = df[["height", "timestamp", "difficulty", "avg_block_s", "ratio", "change_pct"]].copy()
+    disp["difficulty"]   = (disp["difficulty"] / 1e12).round(3).astype(str) + " T"
+    disp["avg_block_s"]  = disp["avg_block_s"].apply(lambda x: f"{x:.0f} s ({x/60:.1f} min)" if x else "—")
+    disp["ratio"]        = disp["ratio"].apply(lambda x: f"{x:.3f}" if x else "—")
+    disp["change_pct"]   = disp["change_pct"].apply(lambda x: f"{x:+.2f}%" if x and not pd.isna(x) else "—")
+    disp["height"]       = disp["height"].apply(lambda x: f"#{int(x):,}")
+    disp["timestamp"]    = disp["timestamp"].dt.strftime("%Y-%m-%d")
+    disp.columns = ["Epoch start", "Date", "Difficulty", "Avg block time", "Ratio", "Δ vs prev epoch"]
+    st.dataframe(disp, use_container_width=True, hide_index=True)
 
-            ```
-            new_difficulty = old_difficulty × (2_016 × 600) / actual_time_seconds
-            ```
+    with st.expander("📖 Difficulty adjustment formula"):
+        st.markdown("""
+Every **2 016 blocks** (~2 weeks) every full node recalculates:
 
-            The adjustment is **capped at ×4 or ÷4** to prevent extreme jumps.
-            If miners found blocks too fast (ratio < 1), difficulty increases.
-            If too slow (ratio > 1), difficulty decreases.
-            """
-        )
+```
+new_difficulty = old_difficulty × (2016 × 600) / actual_seconds
+```
+
+**Constraints:** adjustment is capped at **×4** (max harder) and **÷4** (max easier)
+to prevent extreme swings from a sudden hashrate change.
+
+- Ratio < 1 → blocks came faster than 10 min → difficulty **increases**
+- Ratio > 1 → blocks came slower than 10 min → difficulty **decreases**
+        """)

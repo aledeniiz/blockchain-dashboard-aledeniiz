@@ -1,17 +1,5 @@
 """
-modules/m1_pow.py
-M1 — Proof of Work Monitor
-
-Displays:
-  1. Current Bitcoin difficulty and its visual representation as a leading-zero
-     threshold in the 256-bit SHA-256 space.
-  2. Distribution of inter-block times for the last N blocks.
-     Expected distribution: Exponential(lambda=1/600s) — because block arrivals
-     follow a Poisson process (each hash attempt succeeds independently with
-     constant probability). The memoryless property of the exponential distribution
-     means the time until the next block does not depend on how long we've waited.
-  3. Estimated current network hash rate.
-     Formula: hash_rate ≈ difficulty * 2^32 / 600  (hashes/second)
+modules/m1_pow.py  —  M1: Proof of Work Monitor
 """
 
 import numpy as np
@@ -20,99 +8,115 @@ import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
 
-from api.blockchain_client import get_blocks, bits_to_difficulty
+from api.blockchain_client import bits_to_difficulty
 
+
+# ── helpers ────────────────────────────────────────────────────────────────────
 
 def leading_zero_bits(block_hash: str) -> int:
-    """Count leading zero bits in a hex-encoded block hash."""
     value = int(block_hash, 16)
-    if value == 0:
-        return 256
-    return 256 - value.bit_length()
+    return 256 - value.bit_length() if value else 256
 
 
 def estimate_hashrate(difficulty: float) -> float:
-    """
-    Estimate network hash rate in hashes/second.
-    Each block requires on average difficulty * 2^32 hash attempts.
-    Target block time is 600 seconds.
-    hash_rate = difficulty * 2^32 / 600
-    """
+    """hash_rate ≈ difficulty × 2³² / 600  (H/s)"""
     return difficulty * (2 ** 32) / 600
 
 
-def render(blocks: list):
-    """Render M1 panel in Streamlit."""
-    st.subheader("M1 · Proof of Work Monitor")
+# ── render ─────────────────────────────────────────────────────────────────────
 
+def render(blocks: list):
     if not blocks:
         st.warning("No block data available.")
         return
 
     latest = blocks[-1]
     difficulty = bits_to_difficulty(latest["bits"])
-    hashrate = estimate_hashrate(difficulty)
-    leading_zeros = leading_zero_bits(latest["id"])
+    hashrate   = estimate_hashrate(difficulty)
+    lz_bits    = leading_zero_bits(latest["id"])
 
-    # --- KPI row ---
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Current Difficulty", f"{difficulty/1e12:.2f} T")
-    col2.metric("Est. Hash Rate", f"{hashrate/1e18:.2f} EH/s")
-    col3.metric("Leading zero bits", f"{leading_zeros} bits")
+    # ── KPIs ──────────────────────────────────────────────────────────────────
+    st.markdown("### ⛏️ Current Network Status")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Latest Block",      f"#{latest['height']:,}")
+    c2.metric("Difficulty",        f"{difficulty/1e12:.2f} T")
+    c3.metric("Est. Hash Rate",    f"{hashrate/1e18:.0f} EH/s")
+    c4.metric("Leading Zero Bits", f"{lz_bits} bits")
 
-    # --- Difficulty threshold visualisation ---
-    st.markdown(
-        f"""
-        **What the difficulty means in SHA-256 space:**
-        The current target requires the 256-bit block hash to have at least
-        **{leading_zeros} leading zero bits**.
-        That means the valid hash space is 1 / 2^{leading_zeros} of all possible
-        256-bit values ≈ {1 / (2**leading_zeros):.2e} of the total space.
-        """
+    st.divider()
+
+    # ── PoW explanation ────────────────────────────────────────────────────────
+    st.info(
+        f"**What this means:** The current target requires the 256-bit block hash to start with "
+        f"at least **{lz_bits} leading zero bits** — i.e. the valid hash space is "
+        f"**1 / 2^{lz_bits}** ≈ {1/(2**lz_bits):.2e} of all possible hashes. "
+        f"Miners computed ~{hashrate/1e18:.0f} EH/s to find it."
     )
 
-    # --- Inter-block time distribution ---
-    st.markdown("#### Inter-block time distribution (last {} blocks)".format(len(blocks)))
-    timestamps = [b["timestamp"] for b in blocks]
-    timestamps.sort()
-    inter_times = [timestamps[i+1] - timestamps[i] for i in range(len(timestamps)-1)]
-    inter_times_min = [t / 60 for t in inter_times]
+    # ── Inter-block time histogram ─────────────────────────────────────────────
+    st.markdown("### ⏱️ Inter-block Time Distribution")
+    st.caption(f"Last {len(blocks)} blocks — expected distribution: Exponential(λ = 1/10 min)")
 
-    fig = px.histogram(
-        x=inter_times_min,
-        nbins=30,
-        labels={"x": "Inter-block time (minutes)", "y": "Count"},
-        title="Inter-block time distribution — expected: Exponential(λ=1/10 min)",
-        color_discrete_sequence=["#F7931A"],
+    timestamps = sorted(b["timestamp"] for b in blocks)
+    inter_min  = [(timestamps[i+1] - timestamps[i]) / 60 for i in range(len(timestamps) - 1)]
+
+    fig = go.Figure()
+
+    # Histogram bars
+    fig.add_trace(go.Histogram(
+        x=inter_min,
+        nbinsx=30,
+        name="Observed blocks",
+        marker_color="#F7931A",
+        opacity=0.85,
+        hovertemplate="Time: %{x:.1f} min<br>Count: %{y}<extra></extra>",
+    ))
+
+    # Theoretical Exp(λ=1/10) overlay
+    x_th = np.linspace(0, max(inter_min) * 1.05, 300)
+    lam  = 1 / 10
+    pdf  = lam * np.exp(-lam * x_th) * len(inter_min) * (max(inter_min) / 30)
+    fig.add_trace(go.Scatter(
+        x=x_th, y=pdf,
+        mode="lines",
+        name="Exp(λ=1/10 min) — theoretical",
+        line=dict(color="#ffffff", width=2, dash="dash"),
+        hovertemplate="Time: %{x:.1f} min<br>PDF: %{y:.1f}<extra></extra>",
+    ))
+
+    fig.add_vline(x=10, line=dict(color="#2ecc71", dash="dot", width=1.5),
+                  annotation_text="Target: 10 min", annotation_font_color="#2ecc71")
+
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(15,15,26,0.8)",
+        legend=dict(orientation="h", yanchor="top", y=0.99, xanchor="right", x=0.99),
+        xaxis=dict(title="Inter-block time (minutes)", gridcolor="#2d2d4e"),
+        yaxis=dict(title="Block count", gridcolor="#2d2d4e"),
+        margin=dict(t=20, b=40),
+        bargap=0.05,
     )
-    # Overlay theoretical exponential PDF
-    x_range = np.linspace(0, max(inter_times_min) * 1.1, 200)
-    lambda_param = 1 / 10  # 1 per 10 minutes
-    pdf = lambda_param * np.exp(-lambda_param * x_range) * len(inter_times_min) * (max(inter_times_min) / 30)
-    fig.add_trace(go.Scatter(x=x_range, y=pdf, mode="lines",
-                             name="Exp(λ=1/10 min) theoretical",
-                             line=dict(color="white", dash="dash")))
-    fig.update_layout(template="plotly_dark", legend=dict(orientation="h"))
     st.plotly_chart(fig, use_container_width=True)
 
-    with st.expander("Why exponential distribution?"):
-        st.markdown(
-            """
-            Bitcoin mining is a Bernoulli process: each hash attempt succeeds with
-            probability p = 1/difficulty × 2^32. With ~10^18 attempts per second
-            network-wide, the number of attempts until success follows a geometric
-            distribution, which in continuous time converges to an **Exponential(λ)**
-            distribution with λ = 1/600 seconds. This means block arrivals form a
-            **Poisson process** — they are memoryless and independent.
-            """
-        )
+    with st.expander("📖 Why the exponential distribution?"):
+        st.markdown("""
+Each hash attempt succeeds with probability **p = 1 / (difficulty × 2³²)**.
+With ~10¹⁸ attempts/second network-wide, the number of attempts until success
+follows a **Geometric(p)** distribution, which in continuous time converges to
+**Exponential(λ = 1/600 s)**.
 
-    # --- Recent blocks table ---
-    df = pd.DataFrame([{
-        "Height": b["height"],
-        "Hash (first 16)": b["id"][:16] + "...",
-        "Leading 0-bits": leading_zero_bits(b["id"]),
-        "Tx count": b["tx_count"],
-        "Timestamp": pd.Timestamp(b["timestamp"], unit="s"),
-    } for b in reversed(blocks[-10:])])
-    st.dataframe(df, use_container_width=True)
+Key property: **memorylessness** — the expected time to the next block does not
+depend on how long we have already waited. Block arrivals form a **Poisson process**.
+        """)
+
+    # ── Recent blocks table ────────────────────────────────────────────────────
+    st.markdown("### 🧱 Recent Blocks")
+    rows = [{
+        "Height":          f"#{b['height']:,}",
+        "Hash prefix":     b["id"][:20] + "…",
+        "Leading 0-bits":  leading_zero_bits(b["id"]),
+        "Tx count":        f"{b['tx_count']:,}",
+        "Timestamp (UTC)": pd.Timestamp(b["timestamp"], unit="s").strftime("%Y-%m-%d %H:%M"),
+    } for b in reversed(blocks[-12:])]
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
