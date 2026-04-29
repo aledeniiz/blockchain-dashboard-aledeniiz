@@ -7,7 +7,7 @@ import time
 import streamlit as st
 
 from api.blockchain_client import get_blocks, get_latest_block
-from modules import m1_pow, m2_header, m3_difficulty, m4_ai
+from modules import m1_pow, m2_header, m3_difficulty, m4_ai, m5_merkle
 
 st.set_page_config(
     page_title="CryptoChain Analyzer",
@@ -97,11 +97,12 @@ if blocks:
 st.divider()
 
 # ── Tabs ───────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "⛏️  M1 · Proof of Work",
     "🔍  M2 · Block Header",
     "📈  M3 · Difficulty History",
     "🤖  M4 · AI Anomaly Detector",
+    "🌳  M5 · Merkle Proof",
 ])
 
 with tab1:
@@ -115,6 +116,9 @@ with tab3:
 
 with tab4:
     m4_ai.render(blocks)
+
+with tab5:
+    m5_merkle.render(blocks)
 
 # ── Auto-refresh ───────────────────────────────────────────────────────────────
 if auto_refresh and fetch_ok:
