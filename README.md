@@ -124,3 +124,21 @@ Open <http://localhost:8501> in your browser.
 - mempool.space REST API documentation — <https://mempool.space/docs/api/rest>
 - Blockstream Esplora API documentation — <https://github.com/Blockstream/esplora/blob/master/API.md>
 - scikit-learn Isolation Forest user guide — <https://scikit-learn.org/stable/modules/outlier_detection.html#isolation-forest>
+
+<!-- student-repo-auditor:teacher-feedback:start -->
+## Teacher Feedback
+
+### Kick-off Review
+
+Review time: 2026-04-16 09:59 CEST
+Status: Amber
+
+Strength:
+- Your repository keeps the expected classroom structure.
+
+Improve now:
+- The README is present but still misses part of the required kickoff information.
+
+Next step:
+- Complete the README fields for student information, AI approach, module status, and next step.
+<!-- student-repo-auditor:teacher-feedback:end -->
