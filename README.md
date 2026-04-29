@@ -110,9 +110,17 @@ Open <http://localhost:8501> in your browser.
 ## Project tracking
 
 - **Current progress:** M1–M4 implemented and verified live on mainnet.
-  Optional M5 (Merkle proof) and M6 (51 % attack cost) added for higher rubric
-  coverage. Final PDF report committed to `report/`.
-- **Next step:** keep README updated and let auto-refresh run during the
-  in-class checkpoint demo.
-- **Main blocker:** none at the moment — the project runs end-to-end against
+  Optional M5 (Merkle proof verifier) and M6 (51 % attack cost + Nakamoto §11
+  attack probability) implemented. M6 verified against the original whitepaper
+  Table 1 (q=0.10 z=5, q=0.30 z=5, q=0.30 z=10 match to 7 decimals).
+- **Next step:** add the final PDF report under `report/`, then run the
+  in-class checkpoint demo with auto-refresh active.
+- **Main blocker:** none at the moment — the dashboard runs end-to-end against
   live mempool.space data.
+
+## References
+
+- Nakamoto, S. (2008). [*Bitcoin: A Peer-to-Peer Electronic Cash System*](https://bitcoin.org/bitcoin.pdf), §6 (Difficulty), §7 (Merkle Trees), §11 (Calculations).
+- mempool.space REST API documentation — <https://mempool.space/docs/api/rest>
+- Blockstream Esplora API documentation — <https://github.com/Blockstream/esplora/blob/master/API.md>
+- scikit-learn Isolation Forest user guide — <https://scikit-learn.org/stable/modules/outlier_detection.html#isolation-forest>
