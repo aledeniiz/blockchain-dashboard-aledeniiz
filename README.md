@@ -1,82 +1,118 @@
 # CryptoChain Analyzer Dashboard
 
-**Estudiante:** Alejandro Déniz Solana · [@aledeniiz](https://github.com/aledeniiz)  
-**Asignatura:** Criptografía y Ciberseguridad — Universidad Alfonso X el Sabio (UAX)  
-**Profesor:** Jorge Calvo · [@jmcalvomartin](https://github.com/jmcalvomartin)  
-**Curso:** 2025–26
+**Student:** Alejandro Déniz Solana · [@aledeniiz](https://github.com/aledeniiz)
+**Course:** Cryptography and Cybersecurity — Universidad Alfonso X el Sabio (UAX)
+**Instructor:** Jorge Calvo · [@jmcalvomartin](https://github.com/jmcalvomartin)
+**Academic year:** 2025–26
 
 ---
 
-## ¿Qué es esto?
+## What is this?
 
-Dashboard interactivo en Python/Streamlit que monitoriza métricas criptográficas de Bitcoin en tiempo real, sin necesidad de API key. Construido como práctica de la asignatura de Criptografía.
+Interactive Python/Streamlit dashboard that monitors Bitcoin cryptographic
+metrics in real time, with no API key required. Built as the individual
+project for the Cryptography course (Topic 7 — Hash Functions and Blockchain).
 
-**API utilizada:** [mempool.space](https://mempool.space/api) (primaria) + [Blockstream](https://blockstream.info/api) (fallback)  
-**Auto-refresh:** cada 60 segundos con datos en vivo del bloque más reciente.
+**APIs used:** [mempool.space](https://mempool.space/api) (primary) +
+[Blockstream](https://blockstream.info/api) (fallback)
+**Auto-refresh:** every 60 seconds with live data from the latest block.
 
 ---
 
-## Módulos
+## Modules
 
-| Módulo | Descripción | Estado |
+| Module | Description | Status |
 |--------|-------------|--------|
-| **M1 · Proof of Work** | Dificultad actual, hash rate estimado, distribución de tiempos entre bloques con curva teórica Exp(λ=1/10min) | ✅ Completo |
-| **M2 · Block Header** | Parseo del header de 80 bytes (versión, prev_hash, merkle root, timestamp, bits, nonce) + verificación manual SHA256² con `hashlib` | ✅ Completo |
-| **M3 · Difficulty History** | Histórico de ajustes de dificultad por época (cada 2016 bloques), ratio tiempo real vs objetivo 600s | ✅ Completo |
-| **M4 · AI Anomaly Detector** | Isolation Forest sobre tiempos inter-bloque; detecta bloques estadísticamente anómalos respecto a la distribución Exponencial esperada | ✅ Completo |
+| **M1 · Proof of Work** | Current difficulty, estimated network hash rate, inter-block time histogram with theoretical Exp(λ = 1/10 min) overlay | ✅ Done |
+| **M2 · Block Header** | 80-byte header parse (version, prev_hash, merkle_root, timestamp, bits, nonce) + manual `SHA256²` verification with `hashlib` | ✅ Done |
+| **M3 · Difficulty History** | Per-epoch difficulty adjustment history (every 2016 blocks), ratio of actual time vs the 600 s target | ✅ Done |
+| **M4 · AI Anomaly Detector** | Isolation Forest on inter-block times, flags blocks deviating from the expected exponential baseline | ✅ Done |
+| **M5 · Merkle Proof Verifier** *(optional)* | Pick a transaction, recompute the Merkle path step by step, verify it equals the header's `merkle_root` | ✅ Done |
+| **M6 · Security Score** *(optional)* | USD/hour cost of a 51 % attack from live hash rate; Nakamoto §11 confirmation-depth attack probability | ✅ Done |
 
 ---
 
-## IA elegida (M4) — Justificación
+## Chosen AI approach (M4) — Justification
 
-**Modelo:** Isolation Forest (`scikit-learn`)
+**Model:** Isolation Forest (`scikit-learn`)
 
-Los tiempos entre bloques de Bitcoin siguen una distribución Exponencial(λ=1/600s) porque el proceso de minado es un proceso de Poisson: cada intento de hash tiene probabilidad de éxito constante e independiente. Desviaciones estadísticas de esta baseline pueden indicar:
+Bitcoin inter-block times follow an Exponential(λ = 1/600 s) distribution because
+mining is a memoryless Poisson process: every hash attempt has constant,
+independent success probability. Statistical deviations from this baseline can
+indicate:
 
-- Coordinación entre pools mineros (block withholding)
-- Particiones de red o retrasos de propagación
-- Eventos de cadena huérfana
+- Coordination between mining pools (block withholding)
+- Network partitions or propagation delays
+- Stale / orphan-chain events
 
-Isolation Forest es ideal aquí porque **no requiere datos etiquetados** y aísla anomalías mediante particiones aleatorias — los puntos anómalos (bloques demasiado rápidos o lentos) se aíslan en menos pasos que los bloques normales agrupados en torno a 10 minutos.
+Isolation Forest is a good fit here because **no labeled data is required** and
+it isolates anomalies through random partitioning — anomalous points
+(unusually fast or slow blocks) are isolated in fewer splits than the bulk of
+the data clustered around 10 minutes.
 
-**Features usadas:** `log(inter_block_time + 1)` + `tx_count`
+**Features used:** `log(inter_block_time + 1)` + `tx_count`
+**Evaluation:** percentage of blocks flagged at the chosen contamination rate,
+plus visual inspection against the theoretical Exp(λ = 1/600 s) curve.
 
 ---
 
-## Estructura del proyecto
+## Project structure
 
 ```
 blockchain-dashboard-aledeniiz/
 ├── app.py                      # Entry point: streamlit run app.py
 ├── requirements.txt
 ├── api/
-│   └── blockchain_client.py    # Cliente API: get_blocks, bits_to_difficulty, etc.
-└── modules/
-    ├── m1_pow.py               # M1 · Proof of Work Monitor
-    ├── m2_header.py            # M2 · Block Header Analyzer
-    ├── m3_difficulty.py        # M3 · Difficulty History
-    └── m4_ai.py                # M4 · AI Anomaly Detector
+│   └── blockchain_client.py    # API client: get_blocks, bits_to_difficulty, ...
+├── modules/
+│   ├── m1_pow.py               # M1 · Proof of Work Monitor
+│   ├── m2_header.py            # M2 · Block Header Analyzer
+│   ├── m3_difficulty.py        # M3 · Difficulty History
+│   ├── m4_ai.py                # M4 · AI Anomaly Detector
+│   ├── m5_merkle.py            # M5 · Merkle Proof Verifier (optional)
+│   └── m6_security.py          # M6 · Security Score (optional)
+└── report/
+    └── report.pdf              # Final 2-3 page report
 ```
 
 ---
 
-## Cómo ejecutar
+## How to run
 
 ```bash
-# Instalar dependencias
+# Install dependencies
 pip install -r requirements.txt
 
-# Arrancar el dashboard
+# Launch the dashboard
 streamlit run app.py
 ```
 
-Abre http://localhost:8501 en tu navegador.
+Open <http://localhost:8501> in your browser.
 
 ---
 
-## Conceptos criptográficos clave
+## Key cryptographic concepts
 
-- **Proof of Work:** SHA256(SHA256(header_bytes)) < target. El minero itera el nonce hasta encontrar un hash con suficientes ceros iniciales.
-- **Campo `bits`:** codificación compacta (nBits) del target de 256 bits. `bits = 0xAABBCCDD → T = 0x00BBCCDD × 256^(AA−3)`
-- **Dificultad:** `genesis_target / T`, se reajusta cada 2016 bloques (~2 semanas) para mantener ~10 min/bloque.
-- **Header de 80 bytes:** `version (4B) | prev_hash (32B) | merkle_root (32B) | timestamp (4B) | bits (4B) | nonce (4B)` — en little-endian.
+- **Proof of Work:** `SHA256(SHA256(header_bytes)) < target`. The miner iterates
+  the nonce until it finds a hash with enough leading zeros.
+- **`bits` field:** compact (nBits) encoding of the 256-bit target.
+  `bits = 0xAABBCCDD → T = 0x00BBCCDD × 256^(0xAA − 3)`.
+- **Difficulty:** `genesis_target / T`, retargeted every 2016 blocks (~2 weeks)
+  to keep the network at ~10 min/block.
+- **80-byte header:** `version (4B) | prev_hash (32B) | merkle_root (32B) |
+  timestamp (4B) | bits (4B) | nonce (4B)` — little-endian.
+- **Merkle tree:** all transactions in a block are paired and hashed
+  (`SHA256²`) up the tree until a single root is produced. A Merkle proof
+  needs only `log₂(n)` hashes to verify a transaction is included.
+
+---
+
+## Project tracking
+
+- **Current progress:** M1–M4 implemented and verified live on mainnet.
+  Optional M5 (Merkle proof) and M6 (51 % attack cost) added for higher rubric
+  coverage. Final PDF report committed to `report/`.
+- **Next step:** keep README updated and let auto-refresh run during the
+  in-class checkpoint demo.
+- **Main blocker:** none at the moment — the project runs end-to-end against
+  live mempool.space data.
