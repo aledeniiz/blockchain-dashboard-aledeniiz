@@ -29,21 +29,21 @@ st.markdown("""
 
 <style>
 :root {
-    --bg-0:    #0a0a14;
-    --bg-1:    #11111f;
-    --bg-2:    #1a1a2e;
-    --bg-3:    #232342;
-    --border:  #2d2d4e;
-    --border-2:#3a3a5e;
-    --text:    #f0f0f5;
-    --muted:   #9b9bbf;
-    --muted-2: #6b6b8c;
+    --bg-0:    #f6f7fb;   /* page bg — subtle off-white */
+    --bg-1:    #ffffff;   /* sidebar / cards */
+    --bg-2:    #ffffff;   /* surface 2 */
+    --bg-3:    #f0f1f6;   /* nested blocks */
+    --border:  #e3e4ec;
+    --border-2:#cccfdc;
+    --text:    #1a1a2e;   /* primary dark */
+    --muted:   #5a5a78;   /* secondary */
+    --muted-2: #8a8a9c;   /* tertiary */
     --btc:     #F7931A;
-    --btc-2:   #FFA940;
-    --green:   #2ecc71;
-    --red:     #e74c3c;
-    --blue:    #3498db;
-    --purple:  #9b6bff;
+    --btc-2:   #d97a05;   /* darker for contrast on white */
+    --green:   #16a34a;
+    --red:     #dc2626;
+    --blue:    #2563eb;
+    --purple:  #7c3aed;
 }
 
 /* Global font */
@@ -57,8 +57,8 @@ code, pre, kbd, samp, [data-testid="stCode"] code {
 /* App background — subtle radial gradient */
 [data-testid="stAppViewContainer"] {
     background:
-        radial-gradient(1200px 700px at 80% -10%, rgba(247,147,26,0.10), transparent 60%),
-        radial-gradient(900px 500px at -10% 30%, rgba(155,107,255,0.08), transparent 60%),
+        radial-gradient(1200px 700px at 80% -10%, rgba(247,147,26,0.12), transparent 60%),
+        radial-gradient(900px 500px at -10% 30%, rgba(124,58,237,0.06), transparent 60%),
         var(--bg-0);
 }
 [data-testid="stHeader"] { background: transparent; }
@@ -73,15 +73,15 @@ code, pre, kbd, samp, [data-testid="stCode"] code {
 /* ── Hero card ──────────────────────────────────────────────────────────────── */
 .cc-hero {
     background:
-        linear-gradient(135deg, rgba(247,147,26,0.08), rgba(155,107,255,0.05)),
-        rgba(26,26,46,0.6);
+        linear-gradient(135deg, rgba(247,147,26,0.10), rgba(124,58,237,0.06)),
+        rgba(255,255,255,0.85);
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 22px 28px;
     margin-bottom: 18px;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 24px rgba(26,26,46,0.06);
 }
 .cc-hero-title {
     display: flex; align-items: center; gap: 14px;
@@ -135,29 +135,32 @@ code, pre, kbd, samp, [data-testid="stCode"] code {
 .cc-chip {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 6px 12px; border-radius: 8px;
-    background: rgba(35,35,66,0.55); border: 1px solid var(--border);
+    background: #ffffff; border: 1px solid var(--border);
     font-size: 0.82rem; color: var(--text);
-    transition: border-color 0.15s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 1px 2px rgba(26,26,46,0.04);
 }
-.cc-chip:hover { border-color: var(--btc); }
+.cc-chip:hover {
+    border-color: var(--btc);
+    box-shadow: 0 2px 8px rgba(247,147,26,0.15);
+}
 .cc-chip .label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .cc-chip .value { font-family: 'JetBrains Mono', monospace; color: var(--text); font-weight: 600; }
-.cc-chip.height .value { color: var(--btc); }
+.cc-chip.height .value { color: var(--btc-2); }
 
 /* ── Metric cards (st.metric) ───────────────────────────────────────────────── */
 [data-testid="stMetric"] {
-    background: linear-gradient(180deg, rgba(35,35,66,0.55), rgba(26,26,46,0.55));
+    background: #ffffff;
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 16px 20px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 1px 3px rgba(26,26,46,0.04);
     transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 [data-testid="stMetric"]:hover {
     transform: translateY(-2px);
-    border-color: var(--border-2);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    border-color: var(--btc);
+    box-shadow: 0 8px 24px rgba(247,147,26,0.12);
 }
 [data-testid="stMetricLabel"] {
     font-size: 0.72rem !important;
@@ -196,19 +199,20 @@ code, pre, kbd, samp, [data-testid="stCode"] code {
 }
 [data-testid="stTabs"] [role="tab"]:hover {
     color: var(--text) !important;
-    background: rgba(35,35,66,0.4) !important;
+    background: rgba(247,147,26,0.06) !important;
 }
 [data-testid="stTabs"] [role="tab"][aria-selected="true"] {
-    color: var(--btc) !important;
+    color: var(--btc-2) !important;
     border-bottom: 2px solid var(--btc) !important;
-    background: rgba(247,147,26,0.06) !important;
+    background: rgba(247,147,26,0.10) !important;
     font-weight: 600 !important;
 }
 
 /* ── Sidebar ────────────────────────────────────────────────────────────────── */
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, var(--bg-1), var(--bg-0)) !important;
+    background: #ffffff !important;
     border-right: 1px solid var(--border);
+    box-shadow: 1px 0 0 rgba(26,26,46,0.02);
 }
 [data-testid="stSidebar"] h2 {
     background: linear-gradient(135deg, var(--btc), var(--btc-2));
@@ -221,9 +225,12 @@ code, pre, kbd, samp, [data-testid="stCode"] code {
 [data-testid="stCode"] {
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: var(--bg-1) !important;
+    background: #f8f9fc !important;
 }
 [data-testid="stCode"] pre { background: transparent !important; }
+[data-testid="stCode"] code, [data-testid="stCode"] pre, [data-testid="stCode"] span {
+    color: #1a1a2e !important;
+}
 
 /* ── Dataframes ─────────────────────────────────────────────────────────────── */
 [data-testid="stDataFrame"] {
@@ -241,13 +248,13 @@ hr { border-color: var(--border) !important; opacity: 0.6; }
 [data-testid="stMain"], [data-testid="stMain"] p, [data-testid="stMain"] li,
 [data-testid="stMarkdownContainer"], [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] li, [data-testid="stMarkdownContainer"] span {
-    color: #e8e8f0 !important;
+    color: var(--text) !important;
 }
 
-/* Captions (st.caption) — readable muted but with enough contrast */
+/* Captions (st.caption) */
 [data-testid="stCaptionContainer"], small, .stCaption,
 [data-testid="stMarkdownContainer"] small {
-    color: #b0b0d0 !important;
+    color: var(--muted) !important;
     font-size: 0.82rem !important;
 }
 
@@ -255,24 +262,25 @@ hr { border-color: var(--border) !important; opacity: 0.6; }
 [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
 label, [data-baseweb="form-control"] label,
 [data-testid="stMarkdownContainer"] strong {
-    color: #e8e8f0 !important;
+    color: var(--text) !important;
     font-weight: 500 !important;
 }
 [data-testid="stWidgetLabel"] p { font-size: 0.88rem !important; }
 
 /* Slider min/max ticks and values */
 [data-testid="stSlider"] [data-baseweb="slider"] div,
-[data-testid="stSlider"] span { color: #d0d0e8 !important; }
+[data-testid="stSlider"] span { color: var(--text) !important; }
 
 /* Selectbox / number input values */
 [data-baseweb="select"] div, [data-baseweb="input"] input {
-    color: #f0f0f5 !important;
+    color: var(--text) !important;
 }
-[data-baseweb="input"] input { background: var(--bg-2) !important; }
+[data-baseweb="input"] input { background: #ffffff !important; }
+[data-baseweb="select"] > div { background: #ffffff !important; }
 
 /* Inline code (e.g. `mempool.space`) inside markdown */
 [data-testid="stMarkdownContainer"] code, p code, li code, td code {
-    background: rgba(247,147,26,0.12) !important;
+    background: rgba(247,147,26,0.10) !important;
     color: var(--btc-2) !important;
     border: 1px solid rgba(247,147,26,0.25);
     border-radius: 4px;
@@ -288,9 +296,10 @@ label, [data-baseweb="form-control"] label,
     overflow: hidden;
     width: 100%;
     margin: 8px 0;
+    background: #ffffff;
 }
 [data-testid="stMarkdownContainer"] th {
-    background: var(--bg-2);
+    background: var(--bg-3);
     color: var(--text) !important;
     font-weight: 600;
     text-align: left;
@@ -298,33 +307,36 @@ label, [data-baseweb="form-control"] label,
     border-bottom: 1px solid var(--border);
 }
 [data-testid="stMarkdownContainer"] td {
-    color: #e0e0e8 !important;
+    color: var(--text) !important;
     padding: 8px 12px;
-    border-bottom: 1px solid rgba(45,45,78,0.5);
+    border-bottom: 1px solid var(--border);
+    background: #ffffff;
 }
-[data-testid="stMarkdownContainer"] tr:nth-child(even) td { background: rgba(35,35,66,0.25); }
+[data-testid="stMarkdownContainer"] tr:nth-child(even) td { background: #fafbfd; }
 
 /* Info / Success / Warning / Error boxes */
 [data-testid="stAlert"] {
     border-radius: 10px;
     border: 1px solid var(--border);
     padding: 12px 16px !important;
+    background: #ffffff !important;
 }
 [data-testid="stAlert"] [data-testid="stMarkdownContainer"],
 [data-testid="stAlert"] [data-testid="stMarkdownContainer"] p {
-    color: #f0f0f5 !important;
+    color: var(--text) !important;
 }
 /* Info (blue tint) */
 [data-testid="stAlert"][data-baseweb="notification"] {
-    background: rgba(52,152,219,0.10) !important;
-    border-color: rgba(52,152,219,0.4) !important;
+    background: #f0f6ff !important;
+    border-color: rgba(37,99,235,0.3) !important;
 }
 
 /* Expander */
 [data-testid="stExpander"] {
     border: 1px solid var(--border) !important;
     border-radius: 10px !important;
-    background: rgba(26,26,46,0.4) !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 2px rgba(26,26,46,0.04);
 }
 [data-testid="stExpander"] summary, [data-testid="stExpander"] summary p {
     color: var(--text) !important;
@@ -332,26 +344,29 @@ label, [data-baseweb="form-control"] label,
 }
 [data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
 [data-testid="stExpander"] [data-testid="stMarkdownContainer"] li {
-    color: #e0e0e8 !important;
+    color: var(--text) !important;
 }
 
-/* Sidebar text — explicit overrides because Streamlit nests differently */
+/* Sidebar text */
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] li {
-    color: #e0e0e8 !important;
+    color: var(--text) !important;
 }
 [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
-    color: #a8a8c8 !important;
+    color: var(--muted) !important;
 }
 
 /* Dataframe header / cell colors */
 [data-testid="stDataFrame"] [role="columnheader"] {
-    background: var(--bg-2) !important;
+    background: var(--bg-3) !important;
     color: var(--text) !important;
     font-weight: 600 !important;
 }
-[data-testid="stDataFrame"] [role="gridcell"] { color: #e0e0e8 !important; }
+[data-testid="stDataFrame"] [role="gridcell"] {
+    color: var(--text) !important;
+    background: #ffffff;
+}
 
 /* Plotly chart background — already transparent in module code,
    but ensure surrounding container blends in */
@@ -361,21 +376,22 @@ label, [data-baseweb="form-control"] label,
 .stButton button, .stDownloadButton button {
     border-radius: 8px !important;
     border: 1px solid var(--border) !important;
-    background: var(--bg-2) !important;
+    background: #ffffff !important;
     color: var(--text) !important;
     font-weight: 500 !important;
     transition: all 0.15s ease !important;
 }
 .stButton button:hover, .stDownloadButton button:hover {
     border-color: var(--btc) !important;
-    background: rgba(247,147,26,0.1) !important;
+    background: rgba(247,147,26,0.08) !important;
+    color: var(--btc-2) !important;
 }
 
 /* ── Scrollbar ──────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg-0); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: var(--border-2); }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted-2); }
 
 /* ── Footer ─────────────────────────────────────────────────────────────────── */
 .cc-footer {
@@ -400,9 +416,9 @@ with st.sidebar:
     st.markdown("## ⛓️ CryptoChain")
     st.caption("Live Bitcoin cryptographic metrics")
     st.markdown(
-        '<div style="margin-top:-6px; font-size:0.78rem; color:#9b9bbf;">'
+        '<div style="margin-top:-6px; font-size:0.78rem; color:#5a5a78;">'
         'Source: <a href="https://mempool.space/docs/api" target="_blank" '
-        'style="color:#F7931A; text-decoration:none;">mempool.space</a></div>',
+        'style="color:#d97a05; text-decoration:none; font-weight:500;">mempool.space</a></div>',
         unsafe_allow_html=True,
     )
     st.divider()
@@ -415,12 +431,12 @@ with st.sidebar:
 
     st.divider()
     st.markdown(
-        '<div style="font-size:0.85rem; color:#e0e0e0;"><b>Alejandro Déniz Solana</b></div>'
-        '<div style="font-size:0.75rem; color:#9b9bbf; margin-top:2px;">'
+        '<div style="font-size:0.85rem; color:#1a1a2e;"><b>Alejandro Déniz Solana</b></div>'
+        '<div style="font-size:0.75rem; color:#5a5a78; margin-top:2px;">'
         'UAX · Cryptography 2025-26<br/>Prof. Jorge Calvo</div>'
         '<div style="margin-top:10px;">'
         '<a href="https://github.com/aledeniiz/blockchain-dashboard-aledeniiz" target="_blank" '
-        'style="color:#9b9bbf; font-size:0.78rem; text-decoration:none;">↗ View on GitHub</a></div>',
+        'style="color:#5a5a78; font-size:0.78rem; text-decoration:none; font-weight:500;">↗ View on GitHub</a></div>',
         unsafe_allow_html=True,
     )
 

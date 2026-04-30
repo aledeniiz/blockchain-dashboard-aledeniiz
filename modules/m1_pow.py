@@ -80,7 +80,7 @@ def render(blocks: list):
         x=x_th, y=pdf,
         mode="lines",
         name="Exp(λ=1/10 min) — theoretical",
-        line=dict(color="#ffffff", width=2, dash="dash"),
+        line=dict(color="#1a1a2e", width=2, dash="dash"),
         hovertemplate="Time: %{x:.1f} min<br>PDF: %{y:.1f}<extra></extra>",
     ))
 
@@ -88,12 +88,13 @@ def render(blocks: list):
                   annotation_text="Target: 10 min", annotation_font_color="#2ecc71")
 
     fig.update_layout(
-        template="plotly_dark",
+        template="plotly_white",
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(15,15,26,0.8)",
+        plot_bgcolor="#ffffff",
+        font=dict(color="#1a1a2e"),
         legend=dict(orientation="h", yanchor="top", y=0.99, xanchor="right", x=0.99),
-        xaxis=dict(title="Inter-block time (minutes)", gridcolor="#2d2d4e"),
-        yaxis=dict(title="Block count", gridcolor="#2d2d4e"),
+        xaxis=dict(title="Inter-block time (minutes)", gridcolor="#e3e4ec"),
+        yaxis=dict(title="Block count", gridcolor="#e3e4ec"),
         margin=dict(t=20, b=40),
         bargap=0.05,
     )

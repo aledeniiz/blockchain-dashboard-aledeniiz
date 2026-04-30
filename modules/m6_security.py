@@ -134,11 +134,12 @@ def render(blocks: list):
         textposition="outside",
     ))
     fig_cost.update_layout(
-        template="plotly_dark",
+        template="plotly_white",
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(15,15,26,0.8)",
-        yaxis=dict(title="USD (log scale)", type="log", gridcolor="#2d2d4e"),
-        xaxis=dict(gridcolor="#2d2d4e"),
+        plot_bgcolor="#ffffff",
+        font=dict(color="#1a1a2e"),
+        yaxis=dict(title="USD (log scale)", type="log", gridcolor="#e3e4ec"),
+        xaxis=dict(gridcolor="#e3e4ec"),
         margin=dict(t=30, b=40),
         height=300,
         showlegend=False,
@@ -186,16 +187,17 @@ def render(blocks: list):
         ))
 
     fig.add_hline(y=0.001,
-                  line=dict(color="white", dash="dash", width=1),
-                  annotation_text="0.1 %", annotation_font_color="#aaa")
+                  line=dict(color="#1a1a2e", dash="dash", width=1),
+                  annotation_text="0.1 %", annotation_font_color="#5a5a78")
 
     fig.update_layout(
-        template="plotly_dark",
+        template="plotly_white",
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(15,15,26,0.8)",
-        xaxis=dict(title="Confirmations (z)", gridcolor="#2d2d4e"),
+        plot_bgcolor="#ffffff",
+        font=dict(color="#1a1a2e"),
+        xaxis=dict(title="Confirmations (z)", gridcolor="#e3e4ec"),
         yaxis=dict(title="P(attacker catches up)", type="log",
-                   gridcolor="#2d2d4e", tickformat=".0%"),
+                   gridcolor="#e3e4ec", tickformat=".0%"),
         legend=dict(orientation="h"),
         margin=dict(t=10, b=40),
         height=380,

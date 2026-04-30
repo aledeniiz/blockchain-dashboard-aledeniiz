@@ -102,11 +102,12 @@ def render(blocks: list):
                   annotation_text="Target: 10 min", annotation_font_color="#F7931A")
 
     fig.update_layout(
-        template="plotly_dark",
+        template="plotly_white",
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(15,15,26,0.8)",
-        xaxis=dict(title="Time (UTC)", gridcolor="#2d2d4e"),
-        yaxis=dict(title="Inter-block time (minutes)", gridcolor="#2d2d4e"),
+        plot_bgcolor="#ffffff",
+        font=dict(color="#1a1a2e"),
+        xaxis=dict(title="Time (UTC)", gridcolor="#e3e4ec"),
+        yaxis=dict(title="Inter-block time (minutes)", gridcolor="#e3e4ec"),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=10, b=40),
         height=360,
@@ -133,17 +134,18 @@ def render(blocks: list):
         x=x_th, y=pdf,
         mode="lines",
         name="Exp(λ=1/600 s) theoretical",
-        line=dict(color="white", width=2, dash="dash"),
+        line=dict(color="#1a1a2e", width=2, dash="dash"),
     ))
     fig2.add_vline(x=600, line=dict(color="#F7931A", dash="dot", width=1.5),
                    annotation_text="600 s", annotation_font_color="#F7931A")
     fig2.update_layout(
-        template="plotly_dark",
+        template="plotly_white",
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(15,15,26,0.8)",
+        plot_bgcolor="#ffffff",
+        font=dict(color="#1a1a2e"),
         legend=dict(orientation="h"),
-        xaxis=dict(gridcolor="#2d2d4e"),
-        yaxis=dict(title="Count", gridcolor="#2d2d4e"),
+        xaxis=dict(gridcolor="#e3e4ec"),
+        yaxis=dict(title="Count", gridcolor="#e3e4ec"),
         margin=dict(t=10, b=40),
         height=300,
     )

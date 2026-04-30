@@ -106,15 +106,16 @@ def render(df: pd.DataFrame | None = None):
     for _, row in df.iterrows():
         fig.add_vline(
             x=row["timestamp"].timestamp() * 1000,
-            line=dict(color="rgba(255,255,255,0.12)", dash="dot", width=1),
+            line=dict(color="rgba(26,26,46,0.10)", dash="dot", width=1),
         )
 
     fig.update_layout(
-        template="plotly_dark",
+        template="plotly_white",
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(15,15,26,0.8)",
-        xaxis=dict(title="Date", gridcolor="#2d2d4e"),
-        yaxis=dict(title="Difficulty (Tera)", gridcolor="#2d2d4e"),
+        plot_bgcolor="#ffffff",
+        font=dict(color="#1a1a2e"),
+        xaxis=dict(title="Date", gridcolor="#e3e4ec"),
+        yaxis=dict(title="Difficulty (Tera)", gridcolor="#e3e4ec"),
         legend=dict(orientation="h"),
         margin=dict(t=10, b=40),
         height=340,
@@ -139,15 +140,15 @@ def render(df: pd.DataFrame | None = None):
             ),
         ))
         fig2.add_hline(y=1.0,
-                       line=dict(color="white", dash="dash", width=1.5),
+                       line=dict(color="#1a1a2e", dash="dash", width=1.5),
                        annotation_text="Target: 10 min/block",
-                       annotation_font_color="#ffffff")
+                       annotation_font_color="#1a1a2e")
         fig2.update_layout(
             template="plotly_dark",
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(15,15,26,0.8)",
-            xaxis=dict(title="Epoch start date", gridcolor="#2d2d4e"),
-            yaxis=dict(title="Actual time / 600 s", gridcolor="#2d2d4e"),
+            xaxis=dict(title="Epoch start date", gridcolor="#e3e4ec"),
+            yaxis=dict(title="Actual time / 600 s", gridcolor="#e3e4ec"),
             margin=dict(t=10, b=40),
             height=280,
         )
