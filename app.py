@@ -237,6 +237,126 @@ h1, h2, h3, h4 { color: var(--text) !important; letter-spacing: -0.01em; }
 h3 { font-weight: 700 !important; }
 hr { border-color: var(--border) !important; opacity: 0.6; }
 
+/* ── Body text — override Streamlit defaults for legibility ─────────────────── */
+[data-testid="stMain"], [data-testid="stMain"] p, [data-testid="stMain"] li,
+[data-testid="stMarkdownContainer"], [data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li, [data-testid="stMarkdownContainer"] span {
+    color: #e8e8f0 !important;
+}
+
+/* Captions (st.caption) — readable muted but with enough contrast */
+[data-testid="stCaptionContainer"], small, .stCaption,
+[data-testid="stMarkdownContainer"] small {
+    color: #b0b0d0 !important;
+    font-size: 0.82rem !important;
+}
+
+/* Form labels — sliders, toggles, selects, number inputs */
+[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
+label, [data-baseweb="form-control"] label,
+[data-testid="stMarkdownContainer"] strong {
+    color: #e8e8f0 !important;
+    font-weight: 500 !important;
+}
+[data-testid="stWidgetLabel"] p { font-size: 0.88rem !important; }
+
+/* Slider min/max ticks and values */
+[data-testid="stSlider"] [data-baseweb="slider"] div,
+[data-testid="stSlider"] span { color: #d0d0e8 !important; }
+
+/* Selectbox / number input values */
+[data-baseweb="select"] div, [data-baseweb="input"] input {
+    color: #f0f0f5 !important;
+}
+[data-baseweb="input"] input { background: var(--bg-2) !important; }
+
+/* Inline code (e.g. `mempool.space`) inside markdown */
+[data-testid="stMarkdownContainer"] code, p code, li code, td code {
+    background: rgba(247,147,26,0.12) !important;
+    color: var(--btc-2) !important;
+    border: 1px solid rgba(247,147,26,0.25);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 0.86em;
+}
+
+/* Tables inside markdown */
+[data-testid="stMarkdownContainer"] table {
+    border-collapse: collapse;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+    margin: 8px 0;
+}
+[data-testid="stMarkdownContainer"] th {
+    background: var(--bg-2);
+    color: var(--text) !important;
+    font-weight: 600;
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+}
+[data-testid="stMarkdownContainer"] td {
+    color: #e0e0e8 !important;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(45,45,78,0.5);
+}
+[data-testid="stMarkdownContainer"] tr:nth-child(even) td { background: rgba(35,35,66,0.25); }
+
+/* Info / Success / Warning / Error boxes */
+[data-testid="stAlert"] {
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 12px 16px !important;
+}
+[data-testid="stAlert"] [data-testid="stMarkdownContainer"],
+[data-testid="stAlert"] [data-testid="stMarkdownContainer"] p {
+    color: #f0f0f5 !important;
+}
+/* Info (blue tint) */
+[data-testid="stAlert"][data-baseweb="notification"] {
+    background: rgba(52,152,219,0.10) !important;
+    border-color: rgba(52,152,219,0.4) !important;
+}
+
+/* Expander */
+[data-testid="stExpander"] {
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    background: rgba(26,26,46,0.4) !important;
+}
+[data-testid="stExpander"] summary, [data-testid="stExpander"] summary p {
+    color: var(--text) !important;
+    font-weight: 500 !important;
+}
+[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stExpander"] [data-testid="stMarkdownContainer"] li {
+    color: #e0e0e8 !important;
+}
+
+/* Sidebar text — explicit overrides because Streamlit nests differently */
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] li {
+    color: #e0e0e8 !important;
+}
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+    color: #a8a8c8 !important;
+}
+
+/* Dataframe header / cell colors */
+[data-testid="stDataFrame"] [role="columnheader"] {
+    background: var(--bg-2) !important;
+    color: var(--text) !important;
+    font-weight: 600 !important;
+}
+[data-testid="stDataFrame"] [role="gridcell"] { color: #e0e0e8 !important; }
+
+/* Plotly chart background — already transparent in module code,
+   but ensure surrounding container blends in */
+[data-testid="stPlotlyChart"] { background: transparent; }
+
 /* ── Buttons ────────────────────────────────────────────────────────────────── */
 .stButton button, .stDownloadButton button {
     border-radius: 8px !important;
