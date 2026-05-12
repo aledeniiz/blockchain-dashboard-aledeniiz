@@ -10,13 +10,17 @@
 
 ## Project Title
 
-CryptoChain Analyzer Dashboard — real-time Bitcoin cryptographic metrics with an AI anomaly detector.
+CryptoChain Analyzer Dashboard — real-time Bitcoin cryptographic metrics with two complementary AI components (anomaly detection + difficulty prediction).
 
 ## Chosen AI Approach
 
-**M4 · Anomaly detector — Isolation Forest (`scikit-learn`).**
+**Primary (M4) · Anomaly detector — Isolation Forest (`scikit-learn`).**
 
 Bitcoin inter-block times follow an Exponential(λ = 1/600 s) distribution because mining is a memoryless Poisson process. Isolation Forest is unsupervised (no labels needed), scales linearly, and isolates outliers in fewer random splits than inliers — a natural fit for an exponential-tail anomaly problem. Features used: `log(inter_block_time + 1)` and `tx_count`.
+
+**Secondary (M7, optional) · Difficulty predictor — supervised regression.**
+
+A separate, *supervised* model family (Linear / Ridge / Random Forest) trained on log₁₀(difficulty) across historical adjustment epochs predicts the next 2 016-block retarget value. M4 and M7 cover the two main flavours of ML applied to blockchain data (unsupervised anomaly detection vs supervised time-series forecasting) and are evaluated with different, appropriate metrics (contamination rate + visual exponential overlay vs MAE / MAPE / R² on a chronological test split).
 
 ## Module Tracking
 
@@ -28,23 +32,25 @@ Bitcoin inter-block times follow an Exponential(λ = 1/600 s) distribution becau
 | **M4 · AI Anomaly Detector** | Isolation Forest on inter-block times, flags blocks deviating from the expected exponential baseline | ✅ Done |
 | **M5 · Merkle Proof Verifier** *(optional)* | Pick a transaction, recompute the Merkle path step by step, verify it equals the header's `merkle_root` | ✅ Done |
 | **M6 · Security Score** *(optional)* | USD/hour cost of a 51 % attack from live hash rate; Nakamoto §11 confirmation-depth attack probability | ✅ Done |
+| **M7 · Difficulty Predictor** *(optional, second AI)* | Supervised regression on historical epoch data — Linear / Ridge / Random Forest, evaluated with MAE on log10, MAPE on raw, and R² on a chronological test split | ✅ Done |
 
 ## Current Progress
 
 - **M1–M4 (required core):** implemented and verified live on Bitcoin mainnet through the mempool.space API (with Blockstream as fallback). Auto-refresh every 60 s.
 - **M2 manual PoW check:** the dashboard fetches the raw 80-byte header and reproduces the block hash byte-for-byte using only Python's `hashlib`, confirming `SHA256²(header) < target`.
 - **M4 evaluation:** the empirical inter-block histogram is overlaid with the theoretical Exp(λ = 1/600 s) PDF; the model flags the expected fraction of tail events at the chosen contamination rate.
-- **Optional M5 and M6:** added for higher rubric coverage. M6's Nakamoto §11 implementation matches the whitepaper Table 1 to 7 decimals on the canonical reference points (q = 0.10 z = 5; q = 0.30 z = 5; q = 0.30 z = 10).
+- **All three optional modules (M5, M6, M7) implemented.** M6's Nakamoto §11 formula was cross-checked against a 50-digit `mpmath` reference and matches Nakamoto's original C-code output to 1e-9. M7 introduces a second, supervised AI family (regression on log-difficulty) reporting MAE/MAPE/R².
+- **Automated test suite:** 25 pytest tests under `tests/` covering `bits→target` decoding, double-SHA-256, Merkle math (including the CVE-2012-2459 odd-duplication quirk and sibling tampering), the Nakamoto §11 formula against whitepaper reference points, and four live end-to-end checks against the latest mainnet block. All 25 pass.
 - **Final report:** 2-page PDF committed to `report/report.pdf`, regenerable via `python report/build_report.py`.
-- **UI polish:** light theme with Inter typography, glass-morphism hero card, live/stale indicator, and Plotly white templates throughout.
+- **UI polish:** light theme with Inter typography, glass-morphism hero card, live/stale indicator, and Plotly white templates throughout. `.streamlit/config.toml` pins the theme so the look is identical when re-cloned.
 
 ## Next Step
 
-Run the in-class checkpoint demo (29 April) with auto-refresh active to show all six tabs (M1–M6) updating live, then start a small commit cadence over the next two weeks (caption tweaks, screenshot for the README) to keep the commit history honest before the 14 May deadline.
+Keep a small weekly commit cadence (README polish, captions, screenshot) until 14 May to keep the commit history honest per the rubric C5 penalty, then run the final demo at the deadline.
 
 ## Main Problem or Blocker
 
-None at the moment — the dashboard runs end-to-end against live mempool.space data with the Blockstream fallback wired up. The only known minor caveat is that very large blocks (>4 000 transactions) make the M5 Merkle recomputation slower in the browser; this is documented inside the M5 module.
+None at the moment — the dashboard runs end-to-end against live mempool.space data with the Blockstream fallback wired up, all 25 unit + live tests pass, and `pip install -r requirements.txt && streamlit run app.py` is the single-command bootstrap required by the deliverable. Only minor caveat: very large blocks (>4 000 transactions) make the M5 Merkle recomputation slower in the browser; this is documented inside the M5 module.
 
 ---
 
@@ -61,15 +67,20 @@ Interactive Python/Streamlit dashboard that monitors Bitcoin cryptographic metri
 blockchain-dashboard-aledeniiz/
 ├── app.py                      # Entry point: streamlit run app.py
 ├── requirements.txt
+├── pytest.ini                  # Test config (registers the 'live' marker)
+├── .streamlit/config.toml      # Pinned theme + production server defaults
 ├── api/
 │   └── blockchain_client.py    # API client: get_blocks, bits_to_difficulty, ...
 ├── modules/
 │   ├── m1_pow.py               # M1 · Proof of Work Monitor
 │   ├── m2_header.py            # M2 · Block Header Analyzer
 │   ├── m3_difficulty.py        # M3 · Difficulty History
-│   ├── m4_ai.py                # M4 · AI Anomaly Detector
+│   ├── m4_ai.py                # M4 · AI Anomaly Detector (Isolation Forest)
 │   ├── m5_merkle.py            # M5 · Merkle Proof Verifier (optional)
-│   └── m6_security.py          # M6 · Security Score (optional)
+│   ├── m6_security.py          # M6 · Security Score (optional)
+│   └── m7_predictor.py         # M7 · Difficulty Predictor (optional, 2nd AI)
+├── tests/
+│   └── test_crypto.py          # 25 pytest tests (incl. live mainnet checks)
 └── report/
     ├── build_report.py         # Reproducible PDF generator (reportlab)
     └── report.pdf              # Final 2-page report
@@ -87,6 +98,16 @@ streamlit run app.py
 
 Open <http://localhost:8501> in your browser.
 
+## Running the tests
+
+```bash
+# Full suite (24 unit + 4 live, ~12 s — live tests auto-skip if offline)
+pytest tests/ -v
+
+# Unit only (no network)
+pytest tests/ -v -m "not live"
+```
+
 ## Key cryptographic concepts
 
 - **Proof of Work:** `SHA256(SHA256(header_bytes)) < target`. The miner iterates the nonce until it finds a hash with enough leading zeros.
@@ -101,6 +122,7 @@ Open <http://localhost:8501> in your browser.
 - mempool.space REST API documentation — <https://mempool.space/docs/api/rest>
 - Blockstream Esplora API documentation — <https://github.com/Blockstream/esplora/blob/master/API.md>
 - scikit-learn Isolation Forest user guide — <https://scikit-learn.org/stable/modules/outlier_detection.html#isolation-forest>
+- scikit-learn Linear / Ridge regression user guide — <https://scikit-learn.org/stable/modules/linear_model.html>
 - Liu, F. T., Ting, K. M., & Zhou, Z.-H. (2008). *Isolation Forest.* ICDM 2008. <https://doi.org/10.1109/ICDM.2008.17>
 
 <!-- student-repo-auditor:teacher-feedback:start -->
