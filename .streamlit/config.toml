@@ -1,0 +1,24 @@
+# Streamlit configuration for CryptoChain Analyzer Dashboard.
+# Documented at https://docs.streamlit.io/develop/api-reference/configuration/config.toml
+
+[theme]
+base                   = "light"
+primaryColor           = "#F7931A"
+backgroundColor        = "#f6f7fb"
+secondaryBackgroundColor = "#ffffff"
+textColor              = "#1a1a2e"
+font                   = "sans serif"
+
+[server]
+headless    = true
+port        = 8501
+enableCORS  = false
+enableXsrfProtection = true
+runOnSave   = true
+
+[browser]
+gatherUsageStats = false
+
+[client]
+showErrorDetails = true
+toolbarMode      = "viewer"
